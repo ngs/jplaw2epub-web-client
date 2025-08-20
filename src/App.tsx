@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { createBrowserRouter, RouterProvider } from "react-router";
+import { createBrowserRouter, RouterProvider, Link, useLocation } from "react-router";
 import { ApolloProvider } from "@apollo/client";
 import {
   Container,
@@ -33,6 +33,7 @@ const theme = createTheme({
 const ITEMS_PER_PAGE = 20;
 
 function SearchApp() {
+  const location = useLocation();
   const {
     getSearchParamsFromURL,
     updateURLParams,
@@ -92,10 +93,13 @@ function SearchApp() {
       setSearchParams(params);
       // URLに検索条件がある場合は自動的に検索を開始
       setShouldSearch(true);
+    } else {
+      // URLパラメータが空の場合はフォームをリセット
+      setSearchParams({});
+      setShouldSearch(false);
     }
     setIsInitialized(true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // 初回のみ実行
+  }, [location.search, getSearchParamsFromURL]); // URLのクエリパラメータが変わったら実行
 
   const handleSearch = (data: SearchFormData) => {
     console.log("handleSearch input data:", data);
@@ -125,6 +129,16 @@ function SearchApp() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const handleHomeClick = (e: React.MouseEvent) => {
+    // デフォルトのリンク動作を防ぐ
+    e.preventDefault();
+    // フォームとURLパラメータをリセット
+    setSearchParams({});
+    setShouldSearch(false);
+    // URLパラメータをクリア（これが実際のナビゲーションを行う）
+    updateURLParams({});
+  };
+
   const loading =
     !isInitialized || isKeywordSearch ? keywordLoading : lawsLoading;
   const error = isKeywordSearch ? keywordError : lawsError;
@@ -138,7 +152,20 @@ function SearchApp() {
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
         <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+          <Typography
+            variant="h6"
+            component={Link}
+            to="/"
+            onClick={handleHomeClick}
+            sx={{
+              flexGrow: 1,
+              color: "inherit",
+              textDecoration: "none",
+              "&:hover": {
+                opacity: 0.8,
+              },
+            }}
+          >
             法令検索・EPUB ダウンロード
           </Typography>
         </Toolbar>

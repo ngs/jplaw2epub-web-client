@@ -63,8 +63,24 @@ export const SearchForm: React.FC<SearchFormProps> = ({
   });
 
   useEffect(() => {
-    reset(initialValues);
-  }, [initialValues, reset]);
+    // initialValuesが空オブジェクトになったら（ホームに戻った時）、全フィールドをクリア
+    const defaultValues: SearchFormData = {
+      keyword: "",
+      lawTitle: "",
+      lawTitleKana: "",
+      lawNum: "",
+      lawType: [],
+      asof: "",
+      promulgateDateFrom: "",
+      promulgateDateTo: "",
+    };
+
+    reset({
+      ...defaultValues,
+      ...initialValues,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(initialValues)]);
 
   const searchMode = watch("keyword") ? "keyword" : "law";
 
