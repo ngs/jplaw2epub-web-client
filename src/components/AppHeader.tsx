@@ -16,7 +16,6 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ onHomeClick }) => {
           to="/"
           onClick={onHomeClick}
           sx={{
-            flexGrow: 1,
             color: "inherit",
             textDecoration: "none",
             "&:hover": {

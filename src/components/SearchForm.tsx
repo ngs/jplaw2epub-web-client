@@ -24,7 +24,6 @@ import {
   IconButton,
   Tabs,
   Tab,
-  Link,
   Collapse,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
@@ -455,19 +454,6 @@ export const SearchForm: React.FC<SearchFormProps> = ({
 
         {/* 検索入力フィールド */}
         <Box sx={{ mb: 3 }}>
-          <Typography
-            variant="body2"
-            sx={{ mb: 1, display: "flex", alignItems: "center" }}
-            component={Link}
-            href="https://laws.e-gov.go.jp/help/#how-to-write-a-search-expression"
-            target="_blank"
-          >
-            <IconButton size="small" sx={{ mr: 1 }}>
-              <HelpOutlineIcon />
-            </IconButton>
-            検索式の書き方
-          </Typography>
-
           {searchMode === "name" && (
             <Controller
               name="lawTitle"
