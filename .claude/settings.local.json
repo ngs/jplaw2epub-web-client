@@ -6,7 +6,8 @@
       "Bash(npm run dev:*)",
       "Bash(npm run build:*)",
       "Bash(npm uninstall react-router-dom)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(mv:*)"
     ],
     "deny": [],
     "ask": []

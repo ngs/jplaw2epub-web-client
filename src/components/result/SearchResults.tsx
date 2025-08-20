@@ -7,9 +7,9 @@ import {
   Alert,
   Skeleton,
 } from "@mui/material";
-import { parseGraphQLError } from "../utils/errorParser";
+import { parseGraphQLError } from "../../utils/errorParser";
 import { SearchResultCard } from "./SearchResultCard";
-import type { Law, KeywordItem } from "../types/search";
+import type { Law, KeywordItem } from "../../types/search";
 import type { ApolloError } from "@apollo/client";
 import type { FC } from "react";
 

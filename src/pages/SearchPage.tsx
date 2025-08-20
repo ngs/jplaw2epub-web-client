@@ -2,13 +2,13 @@ import { useQuery } from "@apollo/client";
 import { Container, Box } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router";
-import { AppHeader } from "../components/AppHeader";
-import { SearchForm } from "../components/SearchForm";
-import { SearchResults } from "../components/SearchResults";
+import { SearchForm } from "../components/form/SearchForm";
+import { AppHeader } from "../components/global/AppHeader";
+import { SearchResults } from "../components/result/SearchResults";
 import { ITEMS_PER_PAGE } from "../constants";
 import { SEARCH_LAWS, KEYWORD_SEARCH } from "../graphql/queries";
 import { useQueryParams } from "../hooks/useQueryParams";
-import type { SearchFormData } from "../components/SearchForm";
+import type { SearchFormData } from "../components/form/SearchForm";
 import type { MouseEvent } from "react";
 
 export const SearchPage = () => {

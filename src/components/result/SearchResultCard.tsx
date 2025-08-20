@@ -18,8 +18,8 @@ import { grey } from "@mui/material/colors";
 import type {
   LawType,
   CurrentRevisionStatus,
-} from "../gql/graphql";
-import type { Law, KeywordItem } from "../types/search";
+} from "../../gql/graphql";
+import type { Law, KeywordItem } from "../../types/search";
 import type { FC } from "react";
 
 interface SearchResultCardProps {

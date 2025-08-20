@@ -18,11 +18,11 @@ import {
   categoryOptions,
   eraOptions,
   lawNumTypeOptions,
-} from "../constants";
-import { convertToKanji } from "../utils/convertToKanji";
-import { parseLawNumber, buildLawNumber } from "../utils/lawNumberParser";
+} from "../../constants";
+import { convertToKanji } from "../../utils/convertToKanji";
+import { parseLawNumber, buildLawNumber } from "../../utils/lawNumberParser";
 import { CollapsibleCheckboxGroup } from "./CollapsibleCheckboxGroup";
-import type { LawType, CategoryCode } from "../gql/graphql";
+import type { LawType, CategoryCode } from "../../gql/graphql";
 import type { FC } from "react";
 
 export interface SearchFormData {

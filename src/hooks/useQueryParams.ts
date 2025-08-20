@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { useSearchParams } from "react-router";
-import type { SearchFormData } from "../components/SearchForm";
+import type { SearchFormData } from "../components/form/SearchForm";
 import type { LawType, CategoryCode } from "../gql/graphql";
 
 export const useQueryParams = () => {
