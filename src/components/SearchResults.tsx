@@ -17,7 +17,9 @@ import {
   ListItemText,
 } from "@mui/material";
 import DownloadIcon from "@mui/icons-material/Download";
+import FindInPageIcon from "@mui/icons-material/FindInPage";
 import type { LawType, CurrentRevisionStatus } from "../gql/graphql";
+import { grey } from "@mui/material/colors";
 
 interface Law {
   lawInfo: {
@@ -252,7 +254,10 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
                                     variant="body2"
                                     sx={{
                                       span: {
-                                        backgroundColor: "#ffff66",
+                                        backgroundColor: "warning.main",
+                                        color: "text.primary",
+                                        padding: "0 2px",
+                                        borderRadius: "2px",
                                       },
                                     }}
                                     dangerouslySetInnerHTML={{
@@ -261,8 +266,23 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
                                   ></Typography>
                                 }
                                 secondary={
-                                  sentencePositionLabels[sentence.position] ??
-                                  sentence.position
+                                  <Typography
+                                    variant="caption"
+                                    color="text.secondary"
+                                    component={"div"}
+                                    sx={{
+                                      display: "flex",
+                                      alignItems: "center",
+                                      gap: 0.5,
+                                    }}
+                                  >
+                                    <FindInPageIcon
+                                      sx={{ fontSize: "1em", color: grey[400] }}
+                                    />
+                                    {sentencePositionLabels[
+                                      sentence.position
+                                    ] ?? sentence.position}
+                                  </Typography>
                                 }
                               />
                             </ListItem>
