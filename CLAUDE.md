@@ -27,6 +27,10 @@ npm run lint         # Run ESLint
 npm run lint -- --fix  # Auto-fix ESLint issues
 npm run typecheck    # Run TypeScript type checking
 
+# Testing
+npm test             # Run unit tests with Vitest
+npm run test:e2e     # Run E2E tests with Playwright
+
 # GraphQL Code Generation
 npm run codegen      # Generate TypeScript types from GraphQL schema
 npm run codegen:watch  # Watch mode for codegen
@@ -188,3 +192,18 @@ Custom marked renderer adds features:
 - Heading anchors with slugs
 - Syntax highlighting via highlight.js
 - Japanese character support in slugs
+
+## CI/CD Configuration
+
+### GitHub Actions Workflow
+The project uses GitHub Actions for continuous integration with the following jobs:
+- **lint**: Runs ESLint for code style checking
+- **type-check**: Validates TypeScript types
+- **test**: Executes unit tests with Vitest
+- **e2e**: Runs Playwright end-to-end tests
+- **build**: Builds the production bundle
+
+### Performance Optimizations
+- **Playwright Browser Caching**: E2E tests cache Playwright browsers at `/home/runner/.cache/ms-playwright` using the Playwright version as cache key
+- **npm Dependency Caching**: Node modules are cached automatically through `actions/setup-node`
+- **Japanese Font Support**: E2E tests install `fonts-noto-cjk` for proper Japanese text rendering

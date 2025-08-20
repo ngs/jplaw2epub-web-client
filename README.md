@@ -110,12 +110,31 @@ public-docs/       # Documentation (Markdown)
 ## Commands
 
 ```bash
-npm run dev      # Start development server
-npm run build    # Production build
-npm run preview  # Preview build
-npm run lint     # ESLint check
-npm run typecheck # TypeScript check
+npm run dev           # Start development server
+npm run build         # Production build
+npm run preview       # Preview build
+npm run lint          # ESLint check
+npm run typecheck     # TypeScript check
+npm test              # Run unit tests
+npm run test:e2e      # Run E2E tests with Playwright
+npm run codegen       # Generate GraphQL types
+npm run codegen:watch # Watch mode for GraphQL codegen
 ```
+
+## CI/CD
+
+This project uses GitHub Actions for continuous integration. The CI pipeline includes:
+
+- **Linting**: ESLint code style checks
+- **Type Checking**: TypeScript compilation checks
+- **Unit Tests**: Vitest unit test suite
+- **E2E Tests**: Playwright end-to-end tests
+- **Build**: Production build verification
+
+### Performance Optimizations
+
+- **Playwright Browser Caching**: The CI workflow caches Playwright browser binaries in `/home/runner/.cache/ms-playwright` to speed up E2E test runs
+- **Node Dependencies Caching**: npm packages are cached automatically via `actions/setup-node`
 
 ## Documentation
 
