@@ -1,27 +1,27 @@
 import type { ApolloError } from "@apollo/client";
 
 /**
- * GraphQLエラーから詳細なエラーメッセージを抽出する
+ * Extract detailed error message from GraphQL error
  * @param error - ApolloError
- * @returns フォーマットされたエラーメッセージ
+ * @returns Formatted error message
  */
 export const parseGraphQLError = (error: Error | ApolloError | null): string => {
-  if (!error) return "不明なエラーが発生しました";
+  if (!error) return "An unknown error occurred";
 
-  // ApolloErrorの場合
+  // For ApolloError
   if ("graphQLErrors" in error && error.graphQLErrors?.length > 0) {
-    // GraphQLエラーメッセージを抽出
+    // Extract GraphQL error messages
     const messages = error.graphQLErrors.map((gqlError) => {
       const message = gqlError.message;
       
-      // APIエラーのパースを試みる（例: "API error 400: {...}"）
+      // Try to parse API error (e.g., "API error 400: {...}")
       const apiErrorMatch = message.match(/API error \d+: ({.+})/);
       if (apiErrorMatch) {
         try {
           const apiError = JSON.parse(apiErrorMatch[1]);
           return apiError.message || message;
         } catch {
-          // JSONパースに失敗した場合は元のメッセージを返す
+          // Return original message if JSON parse fails
           return message;
         }
       }
@@ -32,11 +32,11 @@ export const parseGraphQLError = (error: Error | ApolloError | null): string => 
     return messages.join("\n");
   }
 
-  // ネットワークエラーの場合
+  // For network error
   if ("networkError" in error && error.networkError) {
-    return "ネットワークエラーが発生しました。接続を確認してください。";
+    return "A network error occurred. Please check your connection.";
   }
 
-  // 通常のErrorの場合
-  return error.message || "エラーが発生しました";
+  // For regular Error
+  return error.message || "An error occurred";
 };

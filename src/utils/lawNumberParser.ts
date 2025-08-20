@@ -1,17 +1,17 @@
 /**
- * 法令番号のパース結果
+ * Parsed law number result
  */
 export interface ParsedLawNumber {
-  era: string;      // 元号（例: "令和"）
-  year: string;     // 年（漢数字のまま、例: "五"）
-  type: string;     // 種別（例: "法律"）
-  number: string;   // 号数（漢数字のまま、例: "十"）
+  era: string;      // Era (e.g., "令和")
+  year: string;     // Year (kept as kanji, e.g., "五")
+  type: string;     // Type (e.g., "法律")
+  number: string;   // Number (kept as kanji, e.g., "十")
 }
 
 /**
- * 法令番号を個別フィールドにパースする
- * @param lawNum - 法令番号文字列（例: "令和五年法律第十号"）
- * @returns パースされた法令番号の各要素、パースできない場合はnull
+ * Parse law number into individual fields
+ * @param lawNum - Law number string (e.g., "令和五年法律第十号")
+ * @returns Parsed law number elements, or null if unable to parse
  */
 export const parseLawNumber = (lawNum: string | undefined): ParsedLawNumber | null => {
   if (!lawNum) return null;
@@ -31,9 +31,9 @@ export const parseLawNumber = (lawNum: string | undefined): ParsedLawNumber | nu
 };
 
 /**
- * 個別フィールドから法令番号を組み立てる
- * @param fields - 法令番号の各フィールド
- * @returns 組み立てられた法令番号文字列、または空文字列
+ * Build law number from individual fields
+ * @param fields - Law number fields
+ * @returns Built law number string, or empty string
  */
 export const buildLawNumber = (fields: {
   era?: string;

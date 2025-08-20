@@ -110,11 +110,11 @@ export const useQueryParams = () => {
       if (params.lawTitleKana)
         newSearchParams.set("lawTitleKana", params.lawTitleKana);
       if (params.lawNum) newSearchParams.set("lawNum", params.lawNum);
-      // 全7種類の法令種別が選択されている場合はURLパラメータに含めない
+      // Don't include in URL if all 7 law types are selected
       if (params.lawType && params.lawType.length > 0 && params.lawType.length < 7) {
         newSearchParams.set("lawType", params.lawType.join(","));
       }
-      // 全50種類の分類が選択されている場合はURLパラメータに含めない
+      // Don't include in URL if all 50 categories are selected
       if (params.categoryCode && params.categoryCode.length > 0 && params.categoryCode.length < 50) {
         newSearchParams.set("categoryCode", params.categoryCode.join(","));
       }

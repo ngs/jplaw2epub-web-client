@@ -27,7 +27,7 @@ export const SearchPage = () => {
   const currentPage = getCurrentPage();
   const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
-  // 検索条件が整っているかチェック
+  // Check if search parameters are valid
   const hasValidSearchParams = !!(
     searchParams.keyword ||
     searchParams.lawTitle ||
@@ -68,10 +68,10 @@ export const SearchPage = () => {
     const params = getSearchParamsFromURL();
     if (Object.keys(params).length > 0) {
       setSearchParams(params);
-      // URLに検索条件がある場合は自動的に検索を開始
+      // Automatically start search if URL has search parameters
       setShouldSearch(true);
     } else {
-      // URLパラメータが空の場合はフォームをリセット
+      // Reset form if URL parameters are empty
       setSearchParams({});
       setShouldSearch(false);
     }
@@ -79,7 +79,7 @@ export const SearchPage = () => {
   }, [location.search, getSearchParamsFromURL]);
 
   const handleSearch = (data: SearchFormData) => {
-    // 空の値を除外してクリーンなデータを作成
+    // Create clean data by excluding empty values
     const cleanedData = Object.entries(data).reduce((acc, [key, value]) => {
       if (
         value !== undefined &&
@@ -103,12 +103,12 @@ export const SearchPage = () => {
   };
 
   const handleHomeClick = (e: MouseEvent) => {
-    // デフォルトのリンク動作を防ぐ
+    // Prevent default link behavior
     e.preventDefault();
-    // フォームとURLパラメータをリセット
+    // Reset form and URL parameters
     setSearchParams({});
     setShouldSearch(false);
-    // URLパラメータをクリア（これが実際のナビゲーションを行う）
+    // Clear URL parameters (this performs actual navigation)
     updateURLParams({});
   };
 
@@ -128,7 +128,7 @@ export const SearchPage = () => {
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
         <Box sx={{ mb: 4 }}>
           <SearchForm
-            key={`${location.search}-${isInitialized ? "initialized" : "loading"}`} // URL変更時に再マウント
+            key={`${location.search}-${isInitialized ? "initialized" : "loading"}`} // Remount on URL change
             onSearch={handleSearch}
             initialValues={searchParams}
             loading={loading}

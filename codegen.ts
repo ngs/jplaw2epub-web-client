@@ -1,6 +1,6 @@
 import type { CodegenConfig } from '@graphql-codegen/cli';
 
-// 環境変数からエンドポイントを取得（デフォルト値付き）
+// Get endpoint from environment variable (with default value)
 const GRAPHQL_ENDPOINT = process.env.VITE_GRAPHQL_ENDPOINT || 'https://api.jplaw2epub.ngs.io/graphql';
 
 const config: CodegenConfig = {

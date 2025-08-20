@@ -1,22 +1,22 @@
 import { number2kanji } from "@geolonia/japanese-numeral";
 
 /**
- * 数字を漢数字に変換する関数
- * @param input - 変換する文字列（半角数字、全角数字、または漢数字）
- * @returns 漢数字に変換された文字列
+ * Convert numbers to kanji numerals
+ * @param input - String to convert (half-width, full-width numbers, or kanji)
+ * @returns String converted to kanji numerals
  */
 export const convertToKanji = (input: string): string => {
   if (!input) return '';
   
-  // 全角数字を半角に変換
+  // Convert full-width numbers to half-width
   const num = input.replace(/[０-９]/g, (s) => String.fromCharCode(s.charCodeAt(0) - 0xFEE0));
   
-  // 既に漢数字の場合はそのまま返す
+  // Return as-is if already kanji numerals
   if (/^[一二三四五六七八九十百千万億兆零]+$/.test(num)) {
     return num;
   }
   
-  // 半角数字を漢数字に変換
+  // Convert half-width numbers to kanji numerals
   const number = parseInt(num, 10);
   if (isNaN(number)) return input;
   

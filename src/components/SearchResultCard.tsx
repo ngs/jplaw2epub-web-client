@@ -73,7 +73,7 @@ export const SearchResultCard: FC<SearchResultCardProps> = ({
       ? law.currentRevisionInfo.currentRevisionStatus
       : law.revisionInfo?.currentRevisionStatus;
 
-  // 環境変数からEPUBダウンロードのベースURLを取得
+  // Get EPUB download base URL from environment variable
   const EPUB_BASE_URL =
     import.meta.env.VITE_EPUB_BASE_URL || "https://api.jplaw2epub.ngs.io";
 

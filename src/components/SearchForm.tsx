@@ -44,7 +44,7 @@ export interface SearchFormData {
   promulgateDateTo?: string;
 }
 
-// フォーム内部で使用する拡張型
+// Extended type for internal form use
 interface InternalFormData extends SearchFormData {
   searchMode: "name" | "keyword" | "number";
   lawTimeMode?: "current" | "point";
@@ -65,7 +65,7 @@ export const SearchForm: FC<SearchFormProps> = ({
   initialValues = {},
   loading = false,
 }) => {
-  // 法令番号を初期値からパース（漢数字のまま保持）
+  // Parse law number from initial values (keep as kanji)
   const parsedLawNum = parseLawNumber(initialValues?.lawNum);
   const initialLawNumFields = parsedLawNum
     ? {
@@ -88,13 +88,13 @@ export const SearchForm: FC<SearchFormProps> = ({
         lawType:
           initialValues?.lawType?.length ?? 0 > 0
             ? initialValues.lawType
-            : lawCategories.map((cat) => cat.value), // デフォルトで全てチェック
+            : lawCategories.map((cat) => cat.value), // Check all by default
         categoryCode:
           initialValues?.categoryCode?.length ?? 0 > 0
             ? initialValues.categoryCode
-            : categoryOptions.map((cat) => cat.value), // デフォルトで全てチェック
-        ...initialValues, // initialValuesを最後に適用して上書き
-        ...initialLawNumFields, // 法令番号の個別フィールドを追加
+            : categoryOptions.map((cat) => cat.value), // Check all by default
+        ...initialValues, // Apply initialValues last to override
+        ...initialLawNumFields, // Add individual law number fields
       },
     });
 
@@ -107,14 +107,14 @@ export const SearchForm: FC<SearchFormProps> = ({
       lawTitle: "",
       lawTitleKana: "",
       lawNum: "",
-      lawType: lawCategories.map((cat) => cat.value), // デフォルトで全てチェック
-      categoryCode: categoryOptions.map((cat) => cat.value), // デフォルトで全てチェック
+      lawType: lawCategories.map((cat) => cat.value), // Check all by default
+      categoryCode: categoryOptions.map((cat) => cat.value), // Check all by default
       asof: "",
       promulgateDateFrom: "",
       promulgateDateTo: "",
     };
 
-    // 法令番号をパースして個別フィールドに分解（漢数字のまま保持）
+    // Parse law number into individual fields (keep as kanji)
     const parsedFields = parseLawNumber(initialValues?.lawNum);
     const lawNumFields = parsedFields
       ? {
@@ -138,11 +138,11 @@ export const SearchForm: FC<SearchFormProps> = ({
       lawType:
         initialValues?.lawType && initialValues.lawType.length > 0
           ? initialValues.lawType
-          : lawCategories.map((cat) => cat.value), // 初期値がない場合は全てチェック
+          : lawCategories.map((cat) => cat.value), // Check all if no initial value
       categoryCode:
         initialValues?.categoryCode && initialValues.categoryCode.length > 0
           ? initialValues.categoryCode
-          : categoryOptions.map((cat) => cat.value), // 初期値がない場合は全てチェック
+          : categoryOptions.map((cat) => cat.value), // Check all if no initial value
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(initialValues)]);
@@ -156,7 +156,7 @@ export const SearchForm: FC<SearchFormProps> = ({
   const lawNumType = watch("lawNumType");
   const lawNumNo = watch("lawNumNo");
 
-  // 法令番号を組み立てる
+  // Build law number
   useEffect(() => {
     if (searchMode === "number") {
       const lawNum = buildLawNumber({
@@ -172,26 +172,26 @@ export const SearchForm: FC<SearchFormProps> = ({
   }, [lawNumEra, lawNumYear, lawNumType, lawNumNo, searchMode, setValue]);
 
   const handleFormSubmit = (data: InternalFormData) => {
-    // カテゴリが1つも選択されていない場合はエラー
+    // Error if no categories are selected
     if (!data.categoryCode || data.categoryCode.length === 0) {
       setCategoryError("最低1つの分類を選択してください");
       return;
     }
     setCategoryError(null);
 
-    // 法令番号検索の場合、年と号を漢数字に変換
+    // Convert year and number to kanji for law number search
     if (searchMode === "number") {
       if (data.lawNumYear) {
         const kanjiYear = convertToKanji(data.lawNumYear);
         data.lawNumYear = kanjiYear;
-        setValue("lawNumYear", kanjiYear); // フォームの値も更新
+        setValue("lawNumYear", kanjiYear); // Update form value too
       }
       if (data.lawNumNo) {
         const kanjiNo = convertToKanji(data.lawNumNo);
         data.lawNumNo = kanjiNo;
-        setValue("lawNumNo", kanjiNo); // フォームの値も更新
+        setValue("lawNumNo", kanjiNo); // Update form value too
       }
-      // 法令番号を再構築
+      // Rebuild law number
       data.lawNum = buildLawNumber({
         era: data.lawNumEra,
         year: data.lawNumYear,
@@ -228,7 +228,7 @@ export const SearchForm: FC<SearchFormProps> = ({
   return (
     <Paper elevation={1} sx={{ p: 3 }}>
       <Box component="form" onSubmit={handleSubmit(handleFormSubmit)}>
-        {/* 現行法令/時点法令セクション */}
+        {/* Current law / Point-in-time law section */}
         <Box sx={{ mb: 3 }}>
           <Box sx={{ display: "flex", alignItems: "center", mb: 2, gap: 2 }}>
             <Controller
@@ -247,7 +247,7 @@ export const SearchForm: FC<SearchFormProps> = ({
                 name="asof"
                 control={control}
                 render={({ field }) => {
-                  // 今日の日付を取得（YYYY-MM-DD形式）
+                  // Get today's date (YYYY-MM-DD format)
                   const today = new Date().toISOString().split("T")[0];
                   const minDate = "2017-04-01";
 
@@ -276,7 +276,7 @@ export const SearchForm: FC<SearchFormProps> = ({
           </Box>
         </Box>
 
-        {/* 検索モード選択 */}
+        {/* Search mode selection */}
         <Box sx={{ mb: 3, borderBottom: 1, borderColor: "divider" }}>
           <Controller
             name="searchMode"
@@ -296,7 +296,7 @@ export const SearchForm: FC<SearchFormProps> = ({
           />
         </Box>
 
-        {/* 法令種別 */}
+        {/* Law types */}
         <Box sx={{ mb: 3, bgcolor: "#f5f5f5", p: 2, borderRadius: 1 }}>
           <Box sx={{ display: "flex", alignItems: "center", flexWrap: "wrap" }}>
             <Typography variant="body2" sx={{ mr: 3 }}>
@@ -345,7 +345,7 @@ export const SearchForm: FC<SearchFormProps> = ({
           </Box>
         </Box>
 
-        {/* 分類 */}
+        {/* Categories */}
         <Box sx={{ mb: 3, bgcolor: "#f5f5f5", p: 2, borderRadius: 1 }}>
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <Typography variant="body2" sx={{ mr: 3 }}>
@@ -452,7 +452,7 @@ export const SearchForm: FC<SearchFormProps> = ({
           )}
         </Box>
 
-        {/* 検索入力フィールド */}
+        {/* Search input fields */}
         <Box sx={{ mb: 3 }}>
           {searchMode === "name" && (
             <Controller
