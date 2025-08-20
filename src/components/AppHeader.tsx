@@ -1,12 +1,12 @@
-import React from "react";
-import { Link } from "react-router";
 import { AppBar, Toolbar, Typography } from "@mui/material";
+import { Link } from "react-router";
+import type { FC, MouseEvent } from "react";
 
 interface AppHeaderProps {
-  onHomeClick: (e: React.MouseEvent) => void;
+  onHomeClick: (e: MouseEvent) => void;
 }
 
-export const AppHeader: React.FC<AppHeaderProps> = ({ onHomeClick }) => {
+export const AppHeader: FC<AppHeaderProps> = ({ onHomeClick }) => {
   return (
     <AppBar position="static">
       <Toolbar>

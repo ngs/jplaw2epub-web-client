@@ -1,14 +1,7 @@
-import React, { useEffect, useState, Fragment } from "react";
-import { useForm, Controller } from "react-hook-form";
-import {
-  lawCategories,
-  categoryOptions,
-  eraOptions,
-  lawNumTypeOptions,
-} from "../constants";
-import { convertToKanji } from "../utils/convertToKanji";
-import { parseLawNumber, buildLawNumber } from "../utils/lawNumberParser";
-
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import SearchIcon from "@mui/icons-material/Search";
 import {
   TextField,
   Button,
@@ -26,11 +19,18 @@ import {
   Tab,
   Collapse,
 } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import ExpandLessIcon from "@mui/icons-material/ExpandLess";
-import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import { useEffect, useState, Fragment } from "react";
+import { useForm, Controller } from "react-hook-form";
+import {
+  lawCategories,
+  categoryOptions,
+  eraOptions,
+  lawNumTypeOptions,
+} from "../constants";
+import { convertToKanji } from "../utils/convertToKanji";
+import { parseLawNumber, buildLawNumber } from "../utils/lawNumberParser";
 import type { LawType, CategoryCode } from "../gql/graphql";
+import type { FC } from "react";
 
 export interface SearchFormData {
   keyword?: string;
@@ -60,7 +60,7 @@ interface SearchFormProps {
   loading?: boolean;
 }
 
-export const SearchForm: React.FC<SearchFormProps> = ({
+export const SearchForm: FC<SearchFormProps> = ({
   onSearch,
   initialValues = {},
   loading = false,

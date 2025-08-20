@@ -1,4 +1,5 @@
-import React from "react";
+import DownloadIcon from "@mui/icons-material/Download";
+import FindInPageIcon from "@mui/icons-material/FindInPage";
 import {
   Box,
   Card,
@@ -13,14 +14,13 @@ import {
   ListItem,
   ListItemText,
 } from "@mui/material";
-import DownloadIcon from "@mui/icons-material/Download";
-import FindInPageIcon from "@mui/icons-material/FindInPage";
+import { grey } from "@mui/material/colors";
 import type {
   LawType,
   CurrentRevisionStatus,
 } from "../gql/graphql";
-import { grey } from "@mui/material/colors";
 import type { Law, KeywordItem } from "../types/search";
+import type { FC } from "react";
 
 interface SearchResultCardProps {
   item: Law | KeywordItem;
@@ -58,7 +58,7 @@ const sentencePositionLabels: Record<string, string> = {
   toc: "目次",
 };
 
-export const SearchResultCard: React.FC<SearchResultCardProps> = ({
+export const SearchResultCard: FC<SearchResultCardProps> = ({
   item,
   index,
 }) => {

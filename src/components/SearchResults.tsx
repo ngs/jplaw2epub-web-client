@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Box,
   Card,
@@ -8,10 +7,11 @@ import {
   Alert,
   Skeleton,
 } from "@mui/material";
-import { ApolloError } from "@apollo/client";
+import { parseGraphQLError } from "../utils/errorParser";
 import { SearchResultCard } from "./SearchResultCard";
 import type { Law, KeywordItem } from "../types/search";
-import { parseGraphQLError } from "../utils/errorParser";
+import type { ApolloError } from "@apollo/client";
+import type { FC } from "react";
 
 interface SearchResultsProps {
   laws?: Law[];
@@ -25,7 +25,7 @@ interface SearchResultsProps {
   searchMode?: "law" | "keyword";
 }
 
-export const SearchResults: React.FC<SearchResultsProps> = ({
+export const SearchResults: FC<SearchResultsProps> = ({
   laws = [],
   keywordItems = [],
   totalCount,

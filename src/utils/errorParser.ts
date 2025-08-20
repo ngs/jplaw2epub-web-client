@@ -1,4 +1,4 @@
-import { ApolloError } from "@apollo/client";
+import type { ApolloError } from "@apollo/client";
 
 /**
  * GraphQLエラーから詳細なエラーメッセージを抽出する

@@ -1,14 +1,15 @@
+import { useQuery } from "@apollo/client";
+import { Container, Box } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router";
-import { Container, Box } from "@mui/material";
-import { useQuery } from "@apollo/client";
-import { SearchForm } from "../components/SearchForm";
-import type { SearchFormData } from "../components/SearchForm";
-import { SearchResults } from "../components/SearchResults";
 import { AppHeader } from "../components/AppHeader";
-import { useQueryParams } from "../hooks/useQueryParams";
-import { SEARCH_LAWS, KEYWORD_SEARCH } from "../graphql/queries";
+import { SearchForm } from "../components/SearchForm";
+import { SearchResults } from "../components/SearchResults";
 import { ITEMS_PER_PAGE } from "../constants";
+import { SEARCH_LAWS, KEYWORD_SEARCH } from "../graphql/queries";
+import { useQueryParams } from "../hooks/useQueryParams";
+import type { SearchFormData } from "../components/SearchForm";
+import type { MouseEvent } from "react";
 
 export const SearchPage = () => {
   const location = useLocation();
@@ -25,8 +26,6 @@ export const SearchPage = () => {
   const isKeywordSearch = !!searchParams.keyword;
   const currentPage = getCurrentPage();
   const offset = (currentPage - 1) * ITEMS_PER_PAGE;
-
-  console.info(searchParams);
 
   // 検索条件が整っているかチェック
   const hasValidSearchParams = !!(
@@ -80,8 +79,6 @@ export const SearchPage = () => {
   }, [location.search, getSearchParamsFromURL]);
 
   const handleSearch = (data: SearchFormData) => {
-    console.log("handleSearch input data:", data);
-
     // 空の値を除外してクリーンなデータを作成
     const cleanedData = Object.entries(data).reduce((acc, [key, value]) => {
       if (
@@ -94,8 +91,6 @@ export const SearchPage = () => {
       return acc;
     }, {} as SearchFormData);
 
-    console.log("cleanedData:", cleanedData);
-
     setSearchParams(cleanedData);
     updateURLParams(cleanedData);
     setCurrentPage(1);
@@ -107,7 +102,7 @@ export const SearchPage = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleHomeClick = (e: React.MouseEvent) => {
+  const handleHomeClick = (e: MouseEvent) => {
     // デフォルトのリンク動作を防ぐ
     e.preventDefault();
     // フォームとURLパラメータをリセット

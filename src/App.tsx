@@ -1,6 +1,6 @@
-import { createBrowserRouter, RouterProvider } from "react-router";
 import { ApolloProvider } from "@apollo/client";
 import { CssBaseline, ThemeProvider } from "@mui/material";
+import { createBrowserRouter, RouterProvider } from "react-router";
 import { apolloClient } from "./apollo/client";
 import { SearchPage } from "./pages/SearchPage";
 import { theme } from "./theme";
