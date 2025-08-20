@@ -102,6 +102,7 @@ const sentencePositionLabels: Record<string, string> = {
   caption: "見出し",
   amendsupplprovision: "改正附則",
   relatedarticlenum: "関係する条",
+  toc: "目次",
 };
 
 export const SearchResults: React.FC<SearchResultsProps> = ({

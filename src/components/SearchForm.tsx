@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import {
   TextField,
@@ -58,9 +58,13 @@ export const SearchForm: React.FC<SearchFormProps> = ({
   initialValues = {},
   loading = false,
 }) => {
-  const { control, handleSubmit, watch } = useForm<SearchFormData>({
+  const { control, handleSubmit, watch, reset } = useForm<SearchFormData>({
     defaultValues: initialValues,
   });
+
+  useEffect(() => {
+    reset(initialValues);
+  }, [initialValues, reset]);
 
   const searchMode = watch("keyword") ? "keyword" : "law";
 
