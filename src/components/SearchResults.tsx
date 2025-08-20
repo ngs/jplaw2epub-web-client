@@ -8,8 +8,10 @@ import {
   Alert,
   Skeleton,
 } from "@mui/material";
+import { ApolloError } from "@apollo/client";
 import { SearchResultCard } from "./SearchResultCard";
 import type { Law, KeywordItem } from "../types/search";
+import { parseGraphQLError } from "../utils/errorParser";
 
 interface SearchResultsProps {
   laws?: Law[];
@@ -19,7 +21,7 @@ interface SearchResultsProps {
   itemsPerPage: number;
   onPageChange: (page: number) => void;
   loading?: boolean;
-  error?: Error | null;
+  error?: Error | ApolloError | null;
   searchMode?: "law" | "keyword";
 }
 
@@ -54,9 +56,12 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
   }
 
   if (error) {
+    const errorMessage = parseGraphQLError(error);
     return (
-      <Alert severity="error">
-        検索中にエラーが発生しました: {error.message}
+      <Alert severity="error" sx={{ whiteSpace: "pre-wrap" }}>
+        検索中にエラーが発生しました:
+        <br />
+        {errorMessage}
       </Alert>
     );
   }

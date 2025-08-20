@@ -7,6 +7,7 @@ import {
   lawNumTypeOptions,
 } from "../constants";
 import { convertToKanji } from "../utils/convertToKanji";
+import { parseLawNumber, buildLawNumber } from "../utils/lawNumberParser";
 
 import {
   TextField,
@@ -20,11 +21,11 @@ import {
   Select,
   MenuItem,
   InputAdornment,
-  Collapse,
   IconButton,
   Tabs,
   Tab,
   Link,
+  Collapse,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -47,6 +48,7 @@ export interface SearchFormData {
 // フォーム内部で使用する拡張型
 interface InternalFormData extends SearchFormData {
   searchMode: "name" | "keyword" | "number";
+  lawTimeMode?: "current" | "point";
   lawNumEra?: string;
   lawNumYear?: string;
   lawNumType?: string;
@@ -65,20 +67,15 @@ export const SearchForm: React.FC<SearchFormProps> = ({
   loading = false,
 }) => {
   // 法令番号を初期値からパース（漢数字のまま保持）
-  let initialLawNumFields = {};
-  if (initialValues?.lawNum) {
-    const match = initialValues.lawNum.match(
-      /^(令和|平成|昭和|大正|明治)([一二三四五六七八九十百千万億兆零\d]+)年(.+?)第([一二三四五六七八九十百千万億兆零\d]+)号$/
-    );
-    if (match) {
-      initialLawNumFields = {
-        lawNumEra: match[1],
-        lawNumYear: match[2], // 漢数字のまま保持
-        lawNumType: match[3],
-        lawNumNo: match[4], // 漢数字のまま保持
-      };
-    }
-  }
+  const parsedLawNum = parseLawNumber(initialValues?.lawNum);
+  const initialLawNumFields = parsedLawNum
+    ? {
+        lawNumEra: parsedLawNum.era,
+        lawNumYear: parsedLawNum.year,
+        lawNumType: parsedLawNum.type,
+        lawNumNo: parsedLawNum.number,
+      }
+    : {};
 
   const { control, handleSubmit, watch, reset, setValue } =
     useForm<InternalFormData>({
@@ -88,6 +85,7 @@ export const SearchForm: React.FC<SearchFormProps> = ({
           : initialValues?.lawNum
           ? "number"
           : "name",
+        lawTimeMode: initialValues?.asof ? "point" : "current",
         lawType:
           initialValues?.lawType?.length ?? 0 > 0
             ? initialValues.lawType
@@ -101,7 +99,6 @@ export const SearchForm: React.FC<SearchFormProps> = ({
       },
     });
 
-  const [showCurrentLaw, setShowCurrentLaw] = useState(false);
   const [showCategories, setShowCategories] = useState(false);
   const [categoryError, setCategoryError] = useState<string | null>(null);
 
@@ -119,20 +116,15 @@ export const SearchForm: React.FC<SearchFormProps> = ({
     };
 
     // 法令番号をパースして個別フィールドに分解（漢数字のまま保持）
-    let lawNumFields = {};
-    if (initialValues?.lawNum) {
-      const match = initialValues.lawNum.match(
-        /^(令和|平成|昭和|大正|明治)([一二三四五六七八九十百千万億兆零\d]+)年(.+?)第([一二三四五六七八九十百千万億兆零\d]+)号$/
-      );
-      if (match) {
-        lawNumFields = {
-          lawNumEra: match[1],
-          lawNumYear: match[2], // 漢数字のまま保持
-          lawNumType: match[3],
-          lawNumNo: match[4], // 漢数字のまま保持
-        };
-      }
-    }
+    const parsedFields = parseLawNumber(initialValues?.lawNum);
+    const lawNumFields = parsedFields
+      ? {
+          lawNumEra: parsedFields.era,
+          lawNumYear: parsedFields.year,
+          lawNumType: parsedFields.type,
+          lawNumNo: parsedFields.number,
+        }
+      : {};
 
     reset({
       ...defaultValues,
@@ -143,6 +135,7 @@ export const SearchForm: React.FC<SearchFormProps> = ({
         : initialValues?.lawNum
         ? "number"
         : "name",
+      lawTimeMode: initialValues?.asof ? "point" : "current",
       lawType:
         initialValues?.lawType && initialValues.lawType.length > 0
           ? initialValues.lawType
@@ -156,6 +149,7 @@ export const SearchForm: React.FC<SearchFormProps> = ({
   }, [JSON.stringify(initialValues)]);
 
   const searchMode = watch("searchMode");
+  const lawTimeMode = watch("lawTimeMode");
   const selectedLawTypes = watch("lawType") || [];
   const selectedCategories = watch("categoryCode") || [];
   const lawNumEra = watch("lawNumEra");
@@ -165,16 +159,16 @@ export const SearchForm: React.FC<SearchFormProps> = ({
 
   // 法令番号を組み立てる
   useEffect(() => {
-    if (
-      searchMode === "number" &&
-      lawNumEra &&
-      lawNumYear &&
-      lawNumType &&
-      lawNumNo
-    ) {
-      // 値は既に漢数字になっているのでそのまま使用
-      const lawNum = `${lawNumEra}${lawNumYear}年${lawNumType}第${lawNumNo}号`;
-      setValue("lawNum", lawNum);
+    if (searchMode === "number") {
+      const lawNum = buildLawNumber({
+        era: lawNumEra,
+        year: lawNumYear,
+        type: lawNumType,
+        number: lawNumNo,
+      });
+      if (lawNum) {
+        setValue("lawNum", lawNum);
+      }
     }
   }, [lawNumEra, lawNumYear, lawNumType, lawNumNo, searchMode, setValue]);
 
@@ -199,14 +193,12 @@ export const SearchForm: React.FC<SearchFormProps> = ({
         setValue("lawNumNo", kanjiNo); // フォームの値も更新
       }
       // 法令番号を再構築
-      if (
-        data.lawNumEra &&
-        data.lawNumYear &&
-        data.lawNumType &&
-        data.lawNumNo
-      ) {
-        data.lawNum = `${data.lawNumEra}${data.lawNumYear}年${data.lawNumType}第${data.lawNumNo}号`;
-      }
+      data.lawNum = buildLawNumber({
+        era: data.lawNumEra,
+        year: data.lawNumYear,
+        type: data.lawNumType,
+        number: data.lawNumNo,
+      });
     }
 
     const searchData: SearchFormData = {
@@ -215,7 +207,7 @@ export const SearchForm: React.FC<SearchFormProps> = ({
       lawNum: searchMode === "number" ? data.lawNum : undefined,
       lawType: data.lawType,
       categoryCode: data.categoryCode,
-      asof: data.asof,
+      asof: data.lawTimeMode === "point" ? data.asof : undefined,
       promulgateDateFrom: data.promulgateDateFrom,
       promulgateDateTo: data.promulgateDateTo,
     };
@@ -237,32 +229,30 @@ export const SearchForm: React.FC<SearchFormProps> = ({
   return (
     <Paper elevation={1} sx={{ p: 3 }}>
       <Box component="form" onSubmit={handleSubmit(handleFormSubmit)}>
-        {/* 現行法令セクション */}
+        {/* 現行法令/時点法令セクション */}
         <Box sx={{ mb: 3 }}>
-          <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-            <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-              現行法令
-            </Typography>
-            <IconButton
-              size="small"
-              onClick={() => setShowCurrentLaw(!showCurrentLaw)}
-              sx={{ ml: 1 }}
-            >
-              {showCurrentLaw ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-            </IconButton>
-            <IconButton size="small" sx={{ ml: "auto" }}>
-              <HelpOutlineIcon />
-            </IconButton>
-          </Box>
+          <Box sx={{ display: "flex", alignItems: "center", mb: 2, gap: 2 }}>
+            <Controller
+              name="lawTimeMode"
+              control={control}
+              defaultValue="current"
+              render={({ field }) => (
+                <Select {...field} size="small" sx={{ minWidth: 150 }}>
+                  <MenuItem value="current">現行法令</MenuItem>
+                  <MenuItem value="point">時点法令</MenuItem>
+                </Select>
+              )}
+            />
+            {lawTimeMode === "point" && (
+              <Controller
+                name="asof"
+                control={control}
+                render={({ field }) => {
+                  // 今日の日付を取得（YYYY-MM-DD形式）
+                  const today = new Date().toISOString().split("T")[0];
+                  const minDate = "2017-04-01";
 
-          <Collapse in={showCurrentLaw}>
-            <Box sx={{ pl: 2 }}>
-              {/* 時点指定 */}
-              <Box sx={{ mb: 2 }}>
-                <Controller
-                  name="asof"
-                  control={control}
-                  render={({ field }) => (
+                  return (
                     <TextField
                       {...field}
                       label="時点指定"
@@ -270,14 +260,21 @@ export const SearchForm: React.FC<SearchFormProps> = ({
                       size="small"
                       slotProps={{
                         inputLabel: { shrink: true },
+                        htmlInput: {
+                          min: minDate,
+                          max: today,
+                        },
                       }}
                       sx={{ width: 200 }}
                     />
-                  )}
-                />
-              </Box>
-            </Box>
-          </Collapse>
+                  );
+                }}
+              />
+            )}
+            <IconButton size="small" sx={{ ml: "auto" }}>
+              <HelpOutlineIcon />
+            </IconButton>
+          </Box>
         </Box>
 
         {/* 検索モード選択 */}
