@@ -57,3 +57,6 @@ test-grid.tsx
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+test-results/
+playwright-report/
+screenshots

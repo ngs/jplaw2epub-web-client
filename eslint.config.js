@@ -68,7 +68,7 @@ export default tseslint.config([
         },
       ],
       
-      // Disallow React namespace usage
+      // Disallow React namespace usage and enforce arrow function components
       'no-restricted-syntax': [
         'error',
         {
@@ -78,6 +78,10 @@ export default tseslint.config([
         {
           selector: 'MemberExpression[object.name="React"]',
           message: 'React namespace usage is prohibited. Use named imports instead. Example: import { useState } from "react"',
+        },
+        {
+          selector: 'ExportNamedDeclaration > FunctionDeclaration[id.name=/^[A-Z]/]',
+          message: 'Use arrow functions for React components. Example: export const Component: FC<Props> = () => {}',
         },
       ],
     },

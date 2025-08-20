@@ -1,34 +1,28 @@
-import ExpandLessIcon from "@mui/icons-material/ExpandLess";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import SearchIcon from "@mui/icons-material/Search";
 import {
   TextField,
   Button,
   Box,
   Paper,
-  FormControlLabel,
-  Checkbox,
-  FormGroup,
   Typography,
   Select,
   MenuItem,
   InputAdornment,
-  IconButton,
   Tabs,
   Tab,
-  Collapse,
 } from "@mui/material";
-import { useEffect, useState, Fragment } from "react";
+import { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import {
   lawCategories,
   categoryOptions,
   eraOptions,
   lawNumTypeOptions,
-} from "../constants";
-import { convertToKanji } from "../utils/convertToKanji";
-import { parseLawNumber, buildLawNumber } from "../utils/lawNumberParser";
-import type { LawType, CategoryCode } from "../gql/graphql";
+} from "../../constants";
+import { convertToKanji } from "../../utils/convertToKanji";
+import { parseLawNumber, buildLawNumber } from "../../utils/lawNumberParser";
+import { CollapsibleCheckboxGroup } from "./CollapsibleCheckboxGroup";
+import type { LawType, CategoryCode } from "../../gql/graphql";
 import type { FC } from "react";
 
 export interface SearchFormData {
@@ -97,8 +91,8 @@ export const SearchForm: FC<SearchFormProps> = ({
       },
     });
 
-  const [showCategories, setShowCategories] = useState(false);
   const [categoryError, setCategoryError] = useState<string | null>(null);
+  const [lawTypeError, setLawTypeError] = useState<string | null>(null);
 
   useEffect(() => {
     const defaultValues: SearchFormData = {
@@ -171,12 +165,26 @@ export const SearchForm: FC<SearchFormProps> = ({
   }, [lawNumEra, lawNumYear, lawNumType, lawNumNo, searchMode, setValue]);
 
   const handleFormSubmit = (data: InternalFormData) => {
+    let hasErrors = false;
+    // Error if no law types are selected
+    if (!data.lawType || data.lawType.length === 0) {
+      setLawTypeError("最低1つの法令種別を選択してください");
+      hasErrors = true;
+    } else {
+      setLawTypeError(null);
+    }
+
     // Error if no categories are selected
     if (!data.categoryCode || data.categoryCode.length === 0) {
       setCategoryError("最低1つの分類を選択してください");
+      hasErrors = true;
+    } else {
+      setCategoryError(null);
+    }
+
+    if (hasErrors) {
       return;
     }
-    setCategoryError(null);
 
     // Convert year and number to kanji for law number search
     if (searchMode === "number") {
@@ -212,16 +220,18 @@ export const SearchForm: FC<SearchFormProps> = ({
     onSearch(searchData);
   };
 
-  const handleSelectAllCategories = () => {
-    setValue(
-      "categoryCode",
-      categoryOptions.map((cat) => cat.value)
-    );
-    setCategoryError(null);
+  const handleLawTypeChange = (values: LawType[]) => {
+    setValue("lawType", values);
+    if (values.length > 0) {
+      setLawTypeError(null);
+    }
   };
 
-  const handleDeselectAllCategories = () => {
-    setValue("categoryCode", []);
+  const handleCategoryChange = (values: CategoryCode[]) => {
+    setValue("categoryCode", values);
+    if (values.length > 0) {
+      setCategoryError(null);
+    }
   };
 
   return (
@@ -293,160 +303,26 @@ export const SearchForm: FC<SearchFormProps> = ({
         </Box>
 
         {/* Law types */}
-        <Box sx={{ mb: 3, bgcolor: "#f5f5f5", p: 2, borderRadius: 1 }}>
-          <Box sx={{ display: "flex", alignItems: "center", flexWrap: "wrap" }}>
-            <Typography variant="body2" sx={{ mr: 3 }}>
-              法令種別
-            </Typography>
-            <Controller
-              name="lawType"
-              control={control}
-              defaultValue={lawCategories.map((cat) => cat.value)}
-              render={({ field }) => (
-                <FormGroup row>
-                  {lawCategories.map((category) => (
-                    <Fragment key={category.value}>
-                      <FormControlLabel
-                        control={
-                          <Checkbox
-                            size="small"
-                            disabled={
-                              selectedLawTypes.length === 1 &&
-                              selectedLawTypes[0] === category.value
-                            }
-                            checked={selectedLawTypes.includes(category.value)}
-                            onChange={(e) => {
-                              if (e.target.checked) {
-                                field.onChange([
-                                  ...selectedLawTypes,
-                                  category.value,
-                                ]);
-                              } else {
-                                field.onChange(
-                                  selectedLawTypes.filter(
-                                    (t) => t !== category.value
-                                  )
-                                );
-                              }
-                            }}
-                          />
-                        }
-                        label={category.label}
-                      />
-                    </Fragment>
-                  ))}
-                </FormGroup>
-              )}
-            />
-          </Box>
-        </Box>
+        <CollapsibleCheckboxGroup
+          title="法令種別"
+          options={lawCategories}
+          selectedValues={selectedLawTypes as string[]}
+          onChange={handleLawTypeChange as (values: string[]) => void}
+          error={lawTypeError}
+          defaultCollapsed
+          minSelection={1}
+        />
 
         {/* Categories */}
-        <Box sx={{ mb: 3, bgcolor: "#f5f5f5", p: 2, borderRadius: 1 }}>
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <Typography variant="body2" sx={{ mr: 3 }}>
-              分類
-            </Typography>
-            <IconButton
-              size="small"
-              onClick={() => setShowCategories(!showCategories)}
-            >
-              {showCategories ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-            </IconButton>
-            {!showCategories && (
-              <Typography
-                variant="caption"
-                sx={{ ml: 1, color: "text.secondary", cursor: "pointer" }}
-                onClick={() => setShowCategories(true)}
-              >
-                {selectedCategories.length === categoryOptions.length
-                  ? "全て選択中"
-                  : selectedCategories.length === 0
-                  ? "未選択"
-                  : selectedCategories.length <= 5
-                  ? categoryOptions
-                      .filter((opt) => selectedCategories.includes(opt.value))
-                      .map((opt) => opt.label)
-                      .join("、")
-                  : `${selectedCategories.length}件選択中`}
-              </Typography>
-            )}
-            {showCategories && (
-              <Box sx={{ ml: "auto", display: "flex", gap: 1 }}>
-                <Button
-                  size="small"
-                  variant="outlined"
-                  onClick={handleSelectAllCategories}
-                  disabled={
-                    selectedCategories.length === categoryOptions.length
-                  }
-                >
-                  全て選択
-                </Button>
-                <Button
-                  size="small"
-                  variant="outlined"
-                  onClick={handleDeselectAllCategories}
-                  disabled={selectedCategories.length === 0}
-                >
-                  全て解除
-                </Button>
-              </Box>
-            )}
-          </Box>
-          <Collapse in={showCategories} sx={{ mt: showCategories ? 2 : 0 }}>
-            <Controller
-              name="categoryCode"
-              control={control}
-              defaultValue={categoryOptions.map((cat) => cat.value)}
-              render={({ field }) => (
-                <>
-                  <FormGroup row>
-                    {categoryOptions.map((option) => (
-                      <FormControlLabel
-                        key={option.value}
-                        control={
-                          <Checkbox
-                            size="small"
-                            checked={
-                              field.value?.includes(option.value) || false
-                            }
-                            onChange={(e) => {
-                              if (e.target.checked) {
-                                field.onChange([
-                                  ...(field.value || []),
-                                  option.value,
-                                ]);
-                                setCategoryError(null);
-                              } else {
-                                field.onChange(
-                                  (field.value || []).filter(
-                                    (v) => v !== option.value
-                                  )
-                                );
-                              }
-                            }}
-                          />
-                        }
-                        label={option.label}
-                        sx={{ minWidth: 120 }}
-                      />
-                    ))}
-                  </FormGroup>
-                </>
-              )}
-            />
-          </Collapse>
-          {categoryError && (
-            <Typography
-              color="error"
-              variant="caption"
-              sx={{ mt: 1, display: "block" }}
-            >
-              {categoryError}
-            </Typography>
-          )}
-        </Box>
+        <CollapsibleCheckboxGroup
+          title="分類"
+          options={categoryOptions}
+          selectedValues={selectedCategories as string[]}
+          onChange={handleCategoryChange as (values: string[]) => void}
+          error={categoryError}
+          defaultCollapsed
+          minSelection={1}
+        />
 
         {/* Search input fields */}
         <Box sx={{ mb: 3 }}>
