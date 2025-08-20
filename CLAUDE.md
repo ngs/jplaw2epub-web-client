@@ -2,6 +2,16 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Language Guidelines
+
+**IMPORTANT: All documentation, code comments, and commit messages MUST be written in English.**
+
+- Documentation files (README.md, CLAUDE.md, etc.) - English only
+- Code comments - English only  
+- Commit messages - English only
+- Variable names, function names - English preferred (existing Japanese names may remain)
+- User-facing content (UI text, help.md) - May be in Japanese as this is a Japanese law application
+
 ## Project Overview
 
 This is a Japanese Law Search and EPUB Download web application that provides an interface to search Japanese laws and download them as EPUB files. The application interfaces with the jplaw2epub GraphQL API to search laws by name, keyword, or law number, and allows filtering by law types and categories.
@@ -10,11 +20,12 @@ This is a Japanese Law Search and EPUB Download web application that provides an
 
 ```bash
 # Development
-npm run dev          # Start development server with HMR
-npm run build        # Build for production
+npm run dev          # Start development server with HMR (also serves markdown docs)
+npm run build        # Build for production (includes HTML generation from markdown)
 npm run preview      # Preview production build
 npm run lint         # Run ESLint
 npm run lint -- --fix  # Auto-fix ESLint issues
+npm run typecheck    # Run TypeScript type checking
 
 # GraphQL Code Generation
 npm run codegen      # Generate TypeScript types from GraphQL schema
@@ -70,6 +81,7 @@ The project enforces strict ESLint rules:
 3. **Import ordering**: Imports are automatically sorted alphabetically within groups
 4. **No console.log**: Only `console.warn` and `console.error` are allowed
 5. **English comments**: All code comments must be in English
+6. **Unused variables**: Variables starting with underscore (_) are allowed to be unused
 
 ## GraphQL Integration
 
@@ -93,3 +105,86 @@ Run `npm run codegen` after modifying GraphQL queries to regenerate types.
 - `lawNumberParser`: Parses and builds law number strings
 - `errorParser`: Extracts readable messages from GraphQL errors
 - `useQueryParams`: Synchronizes form state with URL parameters
+
+## Project Structure
+
+```
+src/
+├── components/          # React components
+│   ├── SearchForm.tsx      # Main search form with tabs
+│   ├── SearchResults.tsx   # Search results container
+│   └── SearchResultCard.tsx # Individual search result card
+├── constants/           # Constant definitions
+│   ├── colors.ts           # Color palette for theme
+│   ├── lawCategories.ts    # Law category definitions
+│   ├── lawTypes.ts         # Law type definitions
+│   └── pagination.ts       # Pagination constants
+├── hooks/               # Custom React hooks
+│   └── useQueryParams.ts   # URL query parameter sync
+├── queries/             # GraphQL queries
+│   └── index.ts           # All GraphQL query definitions
+├── types/               # TypeScript type definitions
+│   └── search.ts          # Search-related types
+├── utils/               # Utility functions
+│   ├── errorParser.ts     # GraphQL error parsing
+│   └── lawNumberParser.ts # Law number parsing/building
+├── App.tsx              # Main application component
+├── main.tsx             # Application entry point
+└── theme.ts             # MUI theme configuration
+
+vite-plugins/            # Custom Vite plugins
+├── markdown-to-html.ts     # Production markdown → HTML
+├── markdown-dev-server.ts  # Development markdown server
+└── shared/              # Shared plugin utilities
+    ├── html-template.ts    # MUI-styled HTML template
+    └── markdown-processor.ts # Markdown rendering with anchors
+
+public-docs/             # Documentation in Markdown
+└── help.md                # User help documentation
+```
+
+## Markdown Documentation System
+
+The project includes a custom markdown documentation system:
+
+1. **Development**: Markdown files in `public-docs/` are served as HTML at `/{filename}/` routes
+2. **Production**: Markdown files are converted to static HTML during build
+3. **Features**:
+   - MUI-styled HTML output matching app theme
+   - Syntax highlighting for code blocks
+   - Anchor links on h2 and h3 headings
+   - Responsive design
+
+## Recent Changes and Patterns
+
+### Constants Extraction
+All fixed values are extracted to separate files in `src/constants/`:
+- Law categories, types, and era options
+- Pagination settings
+- Color palette (shared between theme and static HTML)
+
+### Error Handling Pattern
+GraphQL errors are parsed to extract API-specific messages:
+```typescript
+const errorMessage = parseGraphQLError(error);
+```
+
+### Form State Management
+Forms use React Hook Form with internal state that extends base types:
+```typescript
+interface InternalFormData extends SearchFormData {
+  // Additional internal fields
+}
+```
+
+### URL Parameter Synchronization
+Search state is persisted in URL for bookmarkable searches:
+```typescript
+const { params, updateParams } = useQueryParams();
+```
+
+### Markdown Rendering
+Custom marked renderer adds features:
+- Heading anchors with slugs
+- Syntax highlighting via highlight.js
+- Japanese character support in slugs

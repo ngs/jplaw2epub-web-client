@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 質問・サポート
+    url: mailto:a@ngs.io
+    about: アプリケーションの使い方に関する質問はこちら
+  - name: セキュリティの問題
+    url: mailto:a@ngs.io
+    about: セキュリティに関する問題は公開Issueではなく直接メールでご連絡ください
