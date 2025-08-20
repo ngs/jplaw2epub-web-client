@@ -8,6 +8,12 @@ export default mergeConfig(
       globals: true,
       environment: "jsdom",
       setupFiles: "./src/test/setup.ts",
+      exclude: [
+        "**/node_modules/**",
+        "**/dist/**",
+        "**/cypress/**",
+        "**/e2e/**",
+      ],
       css: true,
       reporters: [["verbose", { summary: true }]],
       coverage: {
