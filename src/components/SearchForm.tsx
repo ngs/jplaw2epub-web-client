@@ -98,7 +98,9 @@ export const SearchForm: FC<SearchFormProps> = ({
     });
 
   const [showCategories, setShowCategories] = useState(false);
+  const [showLawTypes, setShowLawTypes] = useState(false);
   const [categoryError, setCategoryError] = useState<string | null>(null);
+  const [lawTypeError, setLawTypeError] = useState<string | null>(null);
 
   useEffect(() => {
     const defaultValues: SearchFormData = {
@@ -171,12 +173,26 @@ export const SearchForm: FC<SearchFormProps> = ({
   }, [lawNumEra, lawNumYear, lawNumType, lawNumNo, searchMode, setValue]);
 
   const handleFormSubmit = (data: InternalFormData) => {
+    let hasErrors = false;
+    // Error if no law types are selected
+    if (!data.lawType || data.lawType.length === 0) {
+      setLawTypeError("最低1つの法令種別を選択してください");
+      hasErrors = true;
+    } else {
+      setLawTypeError(null);
+    }
+
     // Error if no categories are selected
     if (!data.categoryCode || data.categoryCode.length === 0) {
       setCategoryError("最低1つの分類を選択してください");
+      hasErrors = true;
+    } else {
+      setCategoryError(null);
+    }
+
+    if (hasErrors) {
       return;
     }
-    setCategoryError(null);
 
     // Convert year and number to kanji for law number search
     if (searchMode === "number") {
@@ -210,6 +226,18 @@ export const SearchForm: FC<SearchFormProps> = ({
       promulgateDateTo: data.promulgateDateTo,
     };
     onSearch(searchData);
+  };
+
+  const handleSelectAllLawTypes = () => {
+    setValue(
+      "lawType",
+      lawCategories.map((cat) => cat.value)
+    );
+    setLawTypeError(null);
+  };
+
+  const handleDeselectAllLawTypes = () => {
+    setValue("lawType", []);
   };
 
   const handleSelectAllCategories = () => {
@@ -294,10 +322,54 @@ export const SearchForm: FC<SearchFormProps> = ({
 
         {/* Law types */}
         <Box sx={{ mb: 3, bgcolor: "#f5f5f5", p: 2, borderRadius: 1 }}>
-          <Box sx={{ display: "flex", alignItems: "center", flexWrap: "wrap" }}>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
             <Typography variant="body2" sx={{ mr: 3 }}>
               法令種別
             </Typography>
+            <IconButton
+              size="small"
+              onClick={() => setShowLawTypes(!showLawTypes)}
+            >
+              {showLawTypes ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+            </IconButton>
+            {!showLawTypes && (
+              <Typography
+                variant="caption"
+                sx={{ ml: 1, color: "text.secondary", cursor: "pointer" }}
+                onClick={() => setShowLawTypes(true)}
+              >
+                {selectedLawTypes.length === lawCategories.length
+                  ? "全て選択中"
+                  : selectedLawTypes.length === 0
+                  ? "未選択"
+                  : lawCategories
+                      .filter((cat) => selectedLawTypes.includes(cat.value))
+                      .map((cat) => cat.label)
+                      .join("、")}
+              </Typography>
+            )}
+            {showLawTypes && (
+              <Box sx={{ ml: "auto", display: "flex", gap: 1 }}>
+                <Button
+                  size="small"
+                  variant="outlined"
+                  onClick={handleSelectAllLawTypes}
+                  disabled={selectedLawTypes.length === lawCategories.length}
+                >
+                  全て選択
+                </Button>
+                <Button
+                  size="small"
+                  variant="outlined"
+                  onClick={handleDeselectAllLawTypes}
+                  disabled={selectedLawTypes.length === 0}
+                >
+                  全て解除
+                </Button>
+              </Box>
+            )}
+          </Box>
+          <Collapse in={showLawTypes} sx={{ mt: showLawTypes ? 2 : 0 }}>
             <Controller
               name="lawType"
               control={control}
@@ -310,10 +382,6 @@ export const SearchForm: FC<SearchFormProps> = ({
                         control={
                           <Checkbox
                             size="small"
-                            disabled={
-                              selectedLawTypes.length === 1 &&
-                              selectedLawTypes[0] === category.value
-                            }
                             checked={selectedLawTypes.includes(category.value)}
                             onChange={(e) => {
                               if (e.target.checked) {
@@ -321,6 +389,7 @@ export const SearchForm: FC<SearchFormProps> = ({
                                   ...selectedLawTypes,
                                   category.value,
                                 ]);
+                                setLawTypeError(null);
                               } else {
                                 field.onChange(
                                   selectedLawTypes.filter(
@@ -338,7 +407,16 @@ export const SearchForm: FC<SearchFormProps> = ({
                 </FormGroup>
               )}
             />
-          </Box>
+          </Collapse>
+          {lawTypeError && (
+            <Typography
+              color="error"
+              variant="caption"
+              sx={{ mt: 1, display: "block" }}
+            >
+              {lawTypeError}
+            </Typography>
+          )}
         </Box>
 
         {/* Categories */}
