@@ -18,51 +18,16 @@ import {
 } from "@mui/material";
 import DownloadIcon from "@mui/icons-material/Download";
 import FindInPageIcon from "@mui/icons-material/FindInPage";
-import type { LawType, CurrentRevisionStatus } from "../gql/graphql";
+import type {
+  LawType,
+  CurrentRevisionStatus,
+  SearchLawsQuery,
+  KeywordSearchQuery,
+} from "../gql/graphql";
 import { grey } from "@mui/material/colors";
 
-interface Law {
-  lawInfo: {
-    lawId: string;
-    lawNum: string;
-    lawType: LawType;
-    promulgationDate?: string | null;
-  };
-  revisionInfo: {
-    lawRevisionId: string;
-    lawTitle: string;
-    lawTitleKana?: string | null;
-    abbrev?: string | null;
-    updated?: string | null;
-    currentRevisionStatus?: CurrentRevisionStatus | null;
-  };
-  currentRevisionInfo?: {
-    lawRevisionId: string;
-    lawTitle: string;
-    currentRevisionStatus?: CurrentRevisionStatus | null;
-  } | null;
-}
-
-interface KeywordItem {
-  lawInfo: {
-    lawId: string;
-    lawNum: string;
-    lawType: LawType;
-    promulgationDate?: string | null;
-  };
-  revisionInfo: {
-    lawRevisionId: string;
-    lawTitle: string;
-    lawTitleKana?: string | null;
-    abbrev?: string | null;
-    updated?: string | null;
-    currentRevisionStatus?: CurrentRevisionStatus | null;
-  };
-  sentences?: Array<{
-    text: string;
-    position: number;
-  }>;
-}
+type Law = SearchLawsQuery["laws"]["laws"][number];
+type KeywordItem = KeywordSearchQuery["keyword"]["items"][number];
 
 interface SearchResultsProps {
   laws?: Law[];
@@ -167,20 +132,20 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
         検索結果: {totalCount.toLocaleString()}件
       </Typography>
 
-      {items.map((item) => {
+      {items.map((item, index) => {
         const isKeywordItem = "sentences" in item;
         const law = item as Law;
         const revisionId =
           !isKeywordItem && law.currentRevisionInfo?.lawRevisionId
             ? law.currentRevisionInfo.lawRevisionId
-            : law.revisionInfo.lawRevisionId;
+            : law.revisionInfo?.lawRevisionId;
         const status =
           !isKeywordItem && law.currentRevisionInfo?.currentRevisionStatus
             ? law.currentRevisionInfo.currentRevisionStatus
-            : law.revisionInfo.currentRevisionStatus;
+            : law.revisionInfo?.currentRevisionStatus;
 
         return (
-          <Card key={law.lawInfo.lawId} sx={{ mb: 2 }}>
+          <Card key={law.lawInfo?.lawId ?? index} sx={{ mb: 2 }}>
             <CardContent>
               <Grid container spacing={2}>
                 <Grid size={{ xs: 12, md: 9 }}>
@@ -190,9 +155,9 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
                       component="h3"
                       sx={{ maxWidth: "100%" }}
                     >
-                      {law.revisionInfo.lawTitleKana ? (
+                      {law.revisionInfo?.lawTitleKana ? (
                         <ruby>
-                          {law.revisionInfo.lawTitle}
+                          {law.revisionInfo?.lawTitle}
                           <Typography
                             variant="caption"
                             color="text.secondary"
@@ -202,7 +167,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
                           </Typography>
                         </ruby>
                       ) : (
-                        law.revisionInfo.lawTitle
+                        law.revisionInfo?.lawTitle
                       )}
                     </Typography>
                     {status && revisionStatusConfig[status] && (
@@ -216,14 +181,17 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
 
                   <Stack direction="row" spacing={2} mb={1}>
                     <Chip
-                      label={lawTypeLabels[law.lawInfo.lawType]}
+                      label={
+                        law.lawInfo?.lawType &&
+                        lawTypeLabels[law.lawInfo.lawType]
+                      }
                       size="small"
                       variant="outlined"
                     />
                     <Typography variant="body2" color="text.secondary">
-                      {law.lawInfo.lawNum}
+                      {law.lawInfo?.lawNum}
                     </Typography>
-                    {law.lawInfo.promulgationDate && (
+                    {law.lawInfo?.promulgationDate && (
                       <Typography variant="body2" color="text.secondary">
                         公布日:{" "}
                         {new Date(
@@ -294,21 +262,23 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
 
                 <Grid size={{ xs: 12, md: 3 }}>
                   <Stack spacing={1}>
-                    <Tooltip title="EPUBをダウンロード">
-                      <Button
-                        variant="contained"
-                        fullWidth
-                        startIcon={<DownloadIcon />}
-                        onClick={() => handleDownloadEpub(revisionId)}
-                      >
-                        EPUBダウンロード
-                      </Button>
-                    </Tooltip>
+                    {revisionId && (
+                      <Tooltip title="EPUBをダウンロード">
+                        <Button
+                          variant="contained"
+                          fullWidth
+                          startIcon={<DownloadIcon />}
+                          onClick={() => handleDownloadEpub(revisionId)}
+                        >
+                          EPUBダウンロード
+                        </Button>
+                      </Tooltip>
+                    )}
                   </Stack>
                 </Grid>
               </Grid>
 
-              {law.revisionInfo.updated && (
+              {law.revisionInfo?.updated && (
                 <Typography
                   variant="caption"
                   color="text.secondary"

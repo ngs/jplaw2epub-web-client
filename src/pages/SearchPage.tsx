@@ -133,6 +133,7 @@ export const SearchPage = () => {
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
         <Box sx={{ mb: 4 }}>
           <SearchForm
+            key={`${location.search}-${isInitialized ? "initialized" : "loading"}`} // URL変更時に再マウント
             onSearch={handleSearch}
             initialValues={searchParams}
             loading={loading}

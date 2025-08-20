@@ -1,7 +1,7 @@
 import { useSearchParams } from "react-router";
 import { useCallback } from "react";
 import type { SearchFormData } from "../components/SearchForm";
-import type { LawType } from "../gql/graphql";
+import type { LawType, CategoryCode } from "../gql/graphql";
 
 export const useQueryParams = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -14,6 +14,7 @@ export const useQueryParams = () => {
     const lawTitleKana = searchParams.get("lawTitleKana");
     const lawNum = searchParams.get("lawNum");
     const lawType = searchParams.get("lawType");
+    const categoryCode = searchParams.get("categoryCode");
     const asof = searchParams.get("asof");
     const promulgateDateFrom = searchParams.get("promulgateDateFrom");
     const promulgateDateTo = searchParams.get("promulgateDateTo");
@@ -36,6 +37,63 @@ export const useQueryParams = () => {
         .split(",")
         .filter((t) => validTypes.includes(t as LawType)) as LawType[];
     }
+    if (categoryCode) {
+      const validCategories: CategoryCode[] = [
+        "ADMINISTRATIVE_ORG",
+        "ADMINISTRATIVE_PROC",
+        "AGRICULTURE",
+        "AVIATION",
+        "BUILDING_HOUSING",
+        "BUSINESS",
+        "CITY_PLANNING",
+        "CIVIL",
+        "CIVIL_SERVICE",
+        "COMMERCE",
+        "CONSTITUTION",
+        "CRIMINAL",
+        "CULTURE",
+        "DEFENSE",
+        "DISASTER_MANAGEMENT",
+        "EDUCATION",
+        "ENVIRONMENTAL_PROTECT",
+        "FINANCE_GENERAL",
+        "FINANCE_INSURANCE",
+        "FIRE_SERVICE",
+        "FISHERIES",
+        "FOREIGN_AFFAIRS",
+        "FOREIGN_EXCHANGE_TRADE",
+        "FORESTRY",
+        "FREIGHT_TRANSPORT",
+        "INDUSTRY",
+        "INDUSTRY_GENERAL",
+        "JUDICIARY",
+        "LABOR",
+        "LAND",
+        "LAND_TRANSPORT",
+        "LOCAL_FINANCE",
+        "LOCAL_GOVERNMENT",
+        "MARITIME_TRANSPORT",
+        "MINING",
+        "NATIONAL_BONDS",
+        "NATIONAL_DEVELOPMENT",
+        "NATIONAL_PROPERTY",
+        "NATIONAL_TAX",
+        "PARLIAMENT",
+        "POLICE",
+        "POSTAL_SERVICE",
+        "PUBLIC_HEALTH",
+        "RIVERS",
+        "ROADS",
+        "SOCIAL_INSURANCE",
+        "SOCIAL_WELFARE",
+        "STATISTICS",
+        "TELECOMMUNICATIONS",
+        "TOURISM",
+      ];
+      params.categoryCode = categoryCode
+        .split(",")
+        .filter((c) => validCategories.includes(c as CategoryCode)) as CategoryCode[];
+    }
     if (asof) params.asof = asof;
     if (promulgateDateFrom) params.promulgateDateFrom = promulgateDateFrom;
     if (promulgateDateTo) params.promulgateDateTo = promulgateDateTo;
@@ -52,8 +110,13 @@ export const useQueryParams = () => {
       if (params.lawTitleKana)
         newSearchParams.set("lawTitleKana", params.lawTitleKana);
       if (params.lawNum) newSearchParams.set("lawNum", params.lawNum);
-      if (params.lawType && params.lawType.length > 0) {
+      // 全7種類の法令種別が選択されている場合はURLパラメータに含めない
+      if (params.lawType && params.lawType.length > 0 && params.lawType.length < 7) {
         newSearchParams.set("lawType", params.lawType.join(","));
+      }
+      // 全50種類の分類が選択されている場合はURLパラメータに含めない
+      if (params.categoryCode && params.categoryCode.length > 0 && params.categoryCode.length < 50) {
+        newSearchParams.set("categoryCode", params.categoryCode.join(","));
       }
       if (params.asof) newSearchParams.set("asof", params.asof);
       if (params.promulgateDateFrom)

@@ -6,6 +6,7 @@ export const SEARCH_LAWS = gql`
     $lawTitleKana: String
     $lawNum: String
     $lawType: [LawType!]
+    $categoryCode: [CategoryCode!]
     $asof: String
     $promulgateDateFrom: String
     $promulgateDateTo: String
@@ -17,6 +18,7 @@ export const SEARCH_LAWS = gql`
       lawTitleKana: $lawTitleKana
       lawNum: $lawNum
       lawType: $lawType
+      categoryCode: $categoryCode
       asof: $asof
       promulgateDateFrom: $promulgateDateFrom
       promulgateDateTo: $promulgateDateTo
@@ -55,6 +57,7 @@ export const KEYWORD_SEARCH = gql`
     $keyword: String!
     $lawNum: String
     $lawType: [LawType!]
+    $categoryCode: [CategoryCode!]
     $asof: String
     $promulgateDateFrom: String
     $promulgateDateTo: String
@@ -66,6 +69,7 @@ export const KEYWORD_SEARCH = gql`
       keyword: $keyword
       lawNum: $lawNum
       lawType: $lawType
+      categoryCode: $categoryCode
       asof: $asof
       promulgateDateFrom: $promulgateDateFrom
       promulgateDateTo: $promulgateDateTo
