@@ -1,21 +1,22 @@
 import { createTheme } from "@mui/material";
+import { colors } from "./constants/colors";
 
 export const theme = createTheme({
   palette: {
     primary: {
-      main: "#29339B", // Dark blue
+      main: colors.primary.main,
     },
     secondary: {
-      main: "#FF3A20", // Red/orange
+      main: colors.secondary.main,
     },
     info: {
-      main: "#74A4BC", // Light blue
+      main: colors.info.main,
     },
     success: {
-      main: "#B6D6CC", // Light green
+      main: colors.success.main,
     },
     warning: {
-      main: "#F1FEC6", // Light yellow
+      main: colors.warning.main,
     },
   },
 });

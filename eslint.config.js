@@ -27,6 +27,16 @@ export default tseslint.config([
       // Disallow console usage except warn and error
       'no-console': ['error', { allow: ['warn', 'error'] }],
       
+      // Allow unused variables that start with underscore
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+        },
+      ],
+      
       // Enforce using import type for type-only imports
       '@typescript-eslint/consistent-type-imports': [
         'error',

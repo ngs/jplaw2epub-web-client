@@ -1,6 +1,5 @@
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import SearchIcon from "@mui/icons-material/Search";
 import {
   TextField,
@@ -270,9 +269,6 @@ export const SearchForm: FC<SearchFormProps> = ({
                 }}
               />
             )}
-            <IconButton size="small" sx={{ ml: "auto" }}>
-              <HelpOutlineIcon />
-            </IconButton>
           </Box>
         </Box>
 
