@@ -1,5 +1,5 @@
 import hljs from "highlight.js";
-import { marked, type Renderer } from "marked";
+import { marked, type Renderer, type Tokens } from "marked";
 
 /**
  * Generate slug from heading text
@@ -7,9 +7,9 @@ import { marked, type Renderer } from "marked";
 function generateSlug(text: string): string {
   return text
     .toLowerCase()
-    .replace(/[^\w\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF\s-]/g, '') // Keep alphanumeric, Japanese characters, spaces and hyphens
-    .replace(/\s+/g, '-') // Replace spaces with hyphens
-    .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+    .replace(/[^\w\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF\s-]/g, "") // Keep alphanumeric, Japanese characters, spaces and hyphens
+    .replace(/\s+/g, "-") // Replace spaces with hyphens
+    .replace(/-+/g, "-") // Replace multiple hyphens with single hyphen
     .trim();
 }
 
@@ -20,29 +20,23 @@ export function createMarkdownRenderer(): Renderer {
   const renderer = new marked.Renderer();
 
   // Custom code highlighting
-  renderer.code = function ({
-    text,
-    lang,
-  }: {
-    text: string;
-    lang?: string | undefined;
-    escaped?: boolean;
-  }): string {
+  renderer.code = function ({ text, lang }: Tokens.Code): string {
     const language = lang || "plaintext";
     const validLanguage = hljs.getLanguage(language) ? language : "plaintext";
     const highlighted = hljs.highlight(text, { language: validLanguage }).value;
     return `<pre><code class="hljs language-${validLanguage}">${highlighted}</code></pre>`;
   };
 
+  // Add target="_blank" if href starts with https?://
+  renderer.link = function ({ href, title, text }: Tokens.Link): string {
+    const target = /^https?:\/\//.test(href)
+      ? ' target="_blank" rel="noopener noreferrer"'
+      : "";
+    return `<a href="${href}"${target} title="${title || ""}">${text}</a>`;
+  };
+
   // Add anchors to h2 and h3 headings
-  renderer.heading = function({
-    text,
-    depth,
-  }: {
-    text: string;
-    depth: number;
-    raw?: string;
-  }): string {
+  renderer.heading = function ({ text, depth }: Tokens.Heading): string {
     if (depth === 2 || depth === 3) {
       const slug = generateSlug(text);
       return `<h${depth} id="${slug}">

@@ -455,18 +455,24 @@ export const SearchForm: FC<SearchFormProps> = ({
               name="lawTitle"
               control={control}
               defaultValue=""
-              render={({ field }) => (
+              rules={{
+                required: "法令名は必須です。",
+              }}
+              render={({ field, fieldState }) => (
                 <TextField
                   {...field}
                   fullWidth
-                  placeholder="検索法令名を入力してください。"
+                  placeholder="法令名を入力してください。"
                   variant="outlined"
+                  error={!!fieldState.error}
+                  helperText={fieldState.error?.message}
                   slotProps={{
                     input: {
                       endAdornment: (
                         <InputAdornment position="end">
                           <Button
                             type="submit"
+                            color="secondary"
                             variant="contained"
                             startIcon={<SearchIcon />}
                             disabled={loading}
@@ -487,11 +493,15 @@ export const SearchForm: FC<SearchFormProps> = ({
               name="keyword"
               control={control}
               defaultValue=""
-              render={({ field }) => (
+              rules={{
+                required: "検索語句は必須です。",
+              }}
+              render={({ field, fieldState }) => (
                 <TextField
                   {...field}
                   fullWidth
-                  placeholder="検索用語を入力してください。"
+                  placeholder="検索語句を入力してください。"
+                  error={!!fieldState.error}
                   variant="outlined"
                   slotProps={{
                     input: {
@@ -499,6 +509,7 @@ export const SearchForm: FC<SearchFormProps> = ({
                         <InputAdornment position="end">
                           <Button
                             type="submit"
+                            color="secondary"
                             variant="contained"
                             startIcon={<SearchIcon />}
                             disabled={loading}
@@ -515,99 +526,192 @@ export const SearchForm: FC<SearchFormProps> = ({
           )}
 
           {searchMode === "number" && (
-            <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-              <Controller
-                name="lawNumEra"
-                control={control}
-                defaultValue=""
-                render={({ field }) => (
-                  <Select
-                    {...field}
-                    displayEmpty
-                    size="small"
-                    sx={{ minWidth: 100 }}
-                  >
-                    <MenuItem value="">元号</MenuItem>
-                    {eraOptions.map((era) => (
-                      <MenuItem key={era.value} value={era.value}>
-                        {era.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                )}
-              />
-              <Controller
-                name="lawNumYear"
-                control={control}
-                defaultValue=""
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    size="small"
-                    placeholder="年"
-                    sx={{ width: 80 }}
-                    onBlur={(e) => {
-                      const value = e.target.value;
-                      if (value) {
-                        const kanjiValue = convertToKanji(value);
-                        field.onChange(kanjiValue);
-                      }
-                      field.onBlur();
-                    }}
-                  />
-                )}
-              />
-              <Typography>年</Typography>
-              <Controller
-                name="lawNumType"
-                control={control}
-                defaultValue=""
-                render={({ field }) => (
-                  <Select
-                    {...field}
-                    displayEmpty
-                    size="small"
-                    sx={{ minWidth: 120 }}
-                  >
-                    <MenuItem value="">種別</MenuItem>
-                    {lawNumTypeOptions.map((type) => (
-                      <MenuItem key={type.value} value={type.value}>
-                        {type.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                )}
-              />
-              <Typography>第</Typography>
-              <Controller
-                name="lawNumNo"
-                control={control}
-                defaultValue=""
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    size="small"
-                    placeholder="号"
-                    sx={{ width: 100 }}
-                    onBlur={(e) => {
-                      const value = e.target.value;
-                      if (value) {
-                        const kanjiValue = convertToKanji(value);
-                        field.onChange(kanjiValue);
-                      }
-                      field.onBlur();
-                    }}
-                  />
-                )}
-              />
-              <Typography>号</Typography>
+            <Box
+              sx={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: {
+                  xs: 2,
+                  sm: 2,
+                  md: 1,
+                },
+                alignItems: {
+                  xs: "flex-start",
+                  sm: "flex-start",
+                  md: "center",
+                },
+                flexDirection: {
+                  xs: "column",
+                  sm: "row",
+                },
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: 1,
+                  alignItems: "center",
+                  flexWrap: {
+                    xs: "wrap",
+                    sm: "nowrap",
+                  },
+                  width: {
+                    xs: "100%",
+                    sm: "auto",
+                  },
+                }}
+              >
+                <Controller
+                  name="lawNumEra"
+                  control={control}
+                  defaultValue=""
+                  rules={{
+                    required: true,
+                  }}
+                  render={({ field, fieldState }) => (
+                    <Select
+                      {...field}
+                      displayEmpty
+                      size="small"
+                      sx={{ minWidth: 100 }}
+                      error={!!fieldState.error}
+                    >
+                      <MenuItem value="">元号</MenuItem>
+                      {eraOptions.map((era) => (
+                        <MenuItem key={era.value} value={era.value}>
+                          {era.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  )}
+                />
+                <Controller
+                  name="lawNumYear"
+                  control={control}
+                  defaultValue=""
+                  rules={{
+                    required: true,
+                  }}
+                  render={({ field, fieldState }) => (
+                    <TextField
+                      {...field}
+                      size="small"
+                      placeholder="年"
+                      sx={{
+                        width: 80,
+                        flexGrow: {
+                          sm: 1,
+                          xs: 1,
+                          md: 0,
+                        },
+                      }}
+                      error={!!fieldState.error}
+                      onBlur={(e) => {
+                        const value = e.target.value;
+                        if (value) {
+                          const kanjiValue = convertToKanji(value);
+                          field.onChange(kanjiValue);
+                        }
+                        field.onBlur();
+                      }}
+                    />
+                  )}
+                />
+                <Typography>年</Typography>
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: 1,
+                  flexWrap: "wrap",
+                  alignItems: "center",
+                  width: {
+                    xs: "100%",
+                    sm: "auto",
+                  },
+                }}
+              >
+                <Controller
+                  name="lawNumType"
+                  control={control}
+                  defaultValue=""
+                  rules={{
+                    required: true,
+                  }}
+                  render={({ field, fieldState }) => (
+                    <Select
+                      {...field}
+                      displayEmpty
+                      size="small"
+                      sx={{ minWidth: 120 }}
+                      error={!!fieldState.error}
+                    >
+                      <MenuItem value="">種別</MenuItem>
+                      {lawNumTypeOptions.map((type) => (
+                        <MenuItem key={type.value} value={type.value}>
+                          {type.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  )}
+                />
+                <Typography>第</Typography>
+                <Controller
+                  name="lawNumNo"
+                  control={control}
+                  defaultValue=""
+                  rules={{
+                    required: true,
+                  }}
+                  render={({ field, fieldState }) => (
+                    <TextField
+                      {...field}
+                      size="small"
+                      placeholder="号"
+                      sx={{
+                        width: 100,
+                        flexGrow: {
+                          sm: 1,
+                          xs: 1,
+                          md: 0,
+                        },
+                      }}
+                      error={!!fieldState.error}
+                      onBlur={(e) => {
+                        const value = e.target.value;
+                        if (value) {
+                          const kanjiValue = convertToKanji(value);
+                          field.onChange(kanjiValue);
+                        }
+                        field.onBlur();
+                      }}
+                    />
+                  )}
+                />
+                <Typography>号</Typography>
+              </Box>
               <Button
                 type="submit"
+                color="secondary"
                 variant="contained"
                 startIcon={<SearchIcon />}
                 disabled={loading}
                 sx={{
-                  ml: 2,
+                  ml: {
+                    sm: 0,
+                    xs: 0,
+                    md: 2,
+                  },
+                  width: {
+                    sm: "100%",
+                    xs: "100%",
+                    md: "auto",
+                  },
+                  mt: {
+                    sm: 2,
+                    xs: 2,
+                    md: 0,
+                  },
                 }}
               >
                 検索

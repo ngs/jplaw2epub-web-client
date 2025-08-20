@@ -31,7 +31,7 @@
 
 1. 「法令番号検索」タブを選択
 2. 法令番号を入力（例：「明治29年法律第89号」）
-   - 元号は漢字（明治、大正、昭和、平成、令和）で入力
+   - 元号を選択
    - 年号は半角数字または漢数字で入力可能
    - 入力後、自動的に漢数字形式に変換されます
 3. 「検索」ボタンをクリック
@@ -100,7 +100,7 @@
 ## 免責事項
 
 - 本アプリケーションは、e-Gov法令検索APIから取得したデータを表示・変換しています
-- 法令の内容については、必ず [e-Gov 法令検索](https://elaws.e-gov.go.jp/) の原文をご確認ください
+- 法令の内容については、必ず [e-Gov 法令検索](https://laws.e-gov.go.jp/) の原文をご確認ください
 - 本アプリケーションの使用により生じたいかなる損害についても、開発者は責任を負いません
 
 ## 作者
@@ -121,5 +121,5 @@
 
 - [e-Gov 法令検索](https://laws.e-gov.go.jp/)
 - [e-Gov 法令API Version 2](https://laws.e-gov.go.jp/api/2/swagger-ui)
-- [EPUB 仕様](https://www.w3.org/publishing/epub32/)
+- [EPUB 仕様](https://www.w3.org/publishing/epub3/)
 - [go.ngs.io](https://go.ngs.io/)

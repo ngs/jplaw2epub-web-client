@@ -8,7 +8,7 @@ export const colors = {
     dark: "#1A2270",
   },
   secondary: {
-    main: "#FF3A20", // Red/orange
+    main: "#d65612ff", // Orange
   },
   info: {
     main: "#74A4BC", // Light blue
@@ -18,5 +18,8 @@ export const colors = {
   },
   warning: {
     main: "#F1FEC6", // Light yellow
+  },
+  errors: {
+    main: "#eeaaaa", // Light pink
   },
 } as const;
