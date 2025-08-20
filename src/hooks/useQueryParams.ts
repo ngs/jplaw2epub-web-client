@@ -1,12 +1,10 @@
-import { useSearchParams, useNavigate, useLocation } from "react-router";
+import { useSearchParams } from "react-router";
 import { useCallback } from "react";
 import type { SearchFormData } from "../components/SearchForm";
 import type { LawType } from "../gql/graphql";
 
 export const useQueryParams = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const location = useLocation();
 
   const getSearchParamsFromURL = useCallback((): SearchFormData => {
     const params: SearchFormData = {};
@@ -63,25 +61,9 @@ export const useQueryParams = () => {
       if (params.promulgateDateTo)
         newSearchParams.set("promulgateDateTo", params.promulgateDateTo);
 
-      // navigateを使って明示的にpushまたはreplaceを制御
-      const search = newSearchParams.toString();
-      const url = search ? `?${search}` : "";
-
-      console.log("updateURLParams:", {
-        currentURL: location.pathname + location.search,
-        newURL: location.pathname + url,
-        replace: options?.replace ?? false,
-        params,
-      });
-
-      if (options?.replace) {
-        navigate(location.pathname + url, { replace: true });
-      } else {
-        // デフォルトはpush（履歴に追加）
-        navigate(location.pathname + url, { replace: false });
-      }
+      setSearchParams(newSearchParams, { replace: options?.replace ?? false });
     },
-    [navigate, location.pathname]
+    [setSearchParams]
   );
 
   const getCurrentPage = useCallback((): number => {
@@ -98,29 +80,13 @@ export const useQueryParams = () => {
         newSearchParams.delete("page");
       }
 
-      // navigateを使って明示的にpushまたはreplaceを制御
-      const search = newSearchParams.toString();
-      const url = search ? `?${search}` : "";
-
-      console.log("setCurrentPage:", {
-        currentURL: location.pathname + location.search,
-        newURL: location.pathname + url,
-        replace: options?.replace ?? false,
-        page,
-      });
-
       if (!options?.updateURL) {
         return;
       }
 
-      if (options?.replace) {
-        navigate(location.pathname + url, { replace: true });
-      } else {
-        // デフォルトはpush（履歴に追加）
-        navigate(location.pathname + url, { replace: false });
-      }
+      setSearchParams(newSearchParams, { replace: options?.replace ?? false });
     },
-    [searchParams, navigate, location.pathname, location.search]
+    [searchParams, setSearchParams]
   );
 
   return {

@@ -12,6 +12,9 @@ import {
   Alert,
   Skeleton,
   Tooltip,
+  List,
+  ListItem,
+  ListItemText,
 } from "@mui/material";
 import DownloadIcon from "@mui/icons-material/Download";
 import type { LawType, CurrentRevisionStatus } from "../gql/graphql";
@@ -93,6 +96,14 @@ const revisionStatusConfig: {
   UNENFORCED: { label: "未施行", color: "warning" },
 };
 
+const sentencePositionLabels: Record<string, string> = {
+  mainprovision: "本則",
+  supplprovision: "附則",
+  caption: "見出し",
+  amendsupplprovision: "改正附則",
+  relatedarticlenum: "関係する条",
+};
+
 export const SearchResults: React.FC<SearchResultsProps> = ({
   laws = [],
   keywordItems = [],
@@ -150,7 +161,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
   return (
     <Box>
       <Typography variant="h6" gutterBottom>
-        検索結果: {totalCount}件
+        検索結果: {totalCount.toLocaleString()}件
       </Typography>
 
       {items.map((item) => {
@@ -171,11 +182,21 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
               <Grid container spacing={2}>
                 <Grid size={{ xs: 12, md: 9 }}>
                   <Stack direction="row" spacing={1} alignItems="center" mb={1}>
-                    <Typography variant="h6" component="h3">
+                    <Typography
+                      variant="h6"
+                      component="h3"
+                      sx={{ maxWidth: "100%" }}
+                    >
                       {law.revisionInfo.lawTitleKana ? (
                         <ruby>
                           {law.revisionInfo.lawTitle}
-                          <rt>{law.revisionInfo.lawTitleKana}</rt>
+                          <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            component={"rt"}
+                          >
+                            {law.revisionInfo.lawTitleKana}
+                          </Typography>
                         </ruby>
                       ) : (
                         law.revisionInfo.lawTitle
@@ -221,22 +242,31 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
                         >
                           該当箇所:
                         </Typography>
-                        {item.sentences.slice(0, 3).map((sentence, index) => (
-                          <Box key={index} sx={{ pl: 2, mb: 1 }}>
-                            <Typography variant="body2">
-                              ...{sentence.text}...
-                            </Typography>
-                          </Box>
-                        ))}
-                        {item.sentences.length > 3 && (
-                          <Typography
-                            variant="body2"
-                            color="text.secondary"
-                            sx={{ pl: 2 }}
-                          >
-                            他 {item.sentences.length - 3} 件
-                          </Typography>
-                        )}
+                        <List>
+                          {item.sentences.map((sentence, index) => (
+                            <ListItem alignItems="flex-start" key={index}>
+                              <ListItemText
+                                primary={
+                                  <Typography
+                                    variant="body2"
+                                    sx={{
+                                      span: {
+                                        backgroundColor: "#ffff66",
+                                      },
+                                    }}
+                                    dangerouslySetInnerHTML={{
+                                      __html: sentence.text,
+                                    }}
+                                  ></Typography>
+                                }
+                                secondary={
+                                  sentencePositionLabels[sentence.position] ??
+                                  sentence.position
+                                }
+                              />
+                            </ListItem>
+                          ))}
+                        </List>
                       </Box>
                     )}
                 </Grid>

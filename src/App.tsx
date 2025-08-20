@@ -81,7 +81,7 @@ function SearchApp() {
       ...searchParams,
       limit: ITEMS_PER_PAGE,
       offset,
-      sentencesLimit: 5,
+      sentencesLimit: ITEMS_PER_PAGE,
     },
     skip: !isKeywordSearch || !shouldSearch || !hasValidSearchParams,
   });
