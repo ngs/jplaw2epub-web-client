@@ -41,7 +41,7 @@ jobs:
         run: npm ci
 
       - name: Run TypeScript type checking
-        run: npx tsc --noEmit
+        run: npx run typecheck
 
   build:
     name: Build
@@ -92,12 +92,11 @@ jobs:
 
       - name: Run tests
         run: npm test
-        continue-on-error: true # Continue even if no test script exists
 
   all-checks:
     name: All CI Checks Passed
     runs-on: ubuntu-latest
-    needs: [lint, type-check, build]
+    needs: [lint, type-check, test, build]
     if: always()
     steps:
       - name: Check if all jobs passed
