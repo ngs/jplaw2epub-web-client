@@ -1,5 +1,6 @@
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
+import { faviconGenerator } from "./vite-plugins/favicon-generator";
 import { markdownDevServerPlugin } from "./vite-plugins/markdown-dev-server";
 import { markdownToHtmlPlugin } from "./vite-plugins/markdown-to-html";
 
@@ -13,7 +14,8 @@ export default defineConfig({
     }),
     markdownDevServerPlugin({
       docsDir: "public-docs"
-    })
+    }),
+    faviconGenerator()
   ],
   base: "/",
   publicDir: "public",
