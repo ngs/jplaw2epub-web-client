@@ -15,9 +15,13 @@ import {
   ListItemText,
 } from "@mui/material";
 import { grey } from "@mui/material/colors";
+import { useState, useCallback } from "react";
+import { EpubDownloadDialog } from "../download/EpubDownloadDialog";
 import type { LawType, CurrentRevisionStatus } from "../../gql/graphql";
 import type { Law, KeywordItem } from "../../types/search";
-import type { FC } from "react";
+import type { FC, MouseEvent } from "react";
+
+const isFileSaveSupported = "showSaveFilePicker" in window;
 
 interface SearchResultCardProps {
   item: Law | KeywordItem;
@@ -59,6 +63,7 @@ export const SearchResultCard: FC<SearchResultCardProps> = ({
   item,
   index,
 }) => {
+  const [downloadDialogOpen, setDownloadDialogOpen] = useState(false);
   const isKeywordItem = "sentences" in item;
   const law = item as Law;
   const revisionId =
@@ -74,13 +79,32 @@ export const SearchResultCard: FC<SearchResultCardProps> = ({
   const EPUB_BASE_URL =
     import.meta.env.VITE_EPUB_BASE_URL || "https://api.jplaw2epub.ngs.io";
 
+  const handleDownloadClick = useCallback(
+    (e: MouseEvent<HTMLAnchorElement>) => {
+      if (!isFileSaveSupported) {
+        return;
+      }
+      e.preventDefault();
+      setDownloadDialogOpen(true);
+    },
+    []
+  );
+
+  const handleDownloadDialogClose = useCallback(() => {
+    setDownloadDialogOpen(false);
+  }, []);
+
   return (
     <Card key={law.lawInfo?.lawId ?? index} sx={{ mb: 2 }}>
       <CardContent>
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, md: 9 }}>
             <Stack direction="row" spacing={1} alignItems="center" mb={1}>
-              <Typography variant="h6" component="h3" sx={{ maxWidth: "100%" }}>
+              <Typography
+                variant="h6"
+                component="h3"
+                sx={{ maxWidth: "calc(100% - 5em)" }}
+              >
                 {law.revisionInfo?.lawTitleKana ? (
                   <ruby>
                     {law.revisionInfo?.lawTitle}
@@ -187,19 +211,28 @@ export const SearchResultCard: FC<SearchResultCardProps> = ({
           <Grid size={{ xs: 12, md: 3 }}>
             <Stack spacing={1}>
               {revisionId && (
-                <Tooltip title="EPUBをダウンロード">
-                  <Button
-                    LinkComponent={"a"}
-                    href={`${EPUB_BASE_URL}/epubs/${revisionId}`}
-                    variant="contained"
-                    fullWidth
-                    target="_blank"
-                    startIcon={<DownloadIcon />}
-                    download={`${revisionId}.epub`}
-                  >
-                    EPUBダウンロード
-                  </Button>
-                </Tooltip>
+                <>
+                  <Tooltip title="EPUBをダウンロード">
+                    <Button
+                      onClick={handleDownloadClick}
+                      LinkComponent={"a"}
+                      href={`${EPUB_BASE_URL}/epubs/${revisionId}`}
+                      download={`${revisionId}.epub`}
+                      variant="contained"
+                      fullWidth
+                      startIcon={<DownloadIcon />}
+                    >
+                      EPUBダウンロード
+                    </Button>
+                  </Tooltip>
+                  <EpubDownloadDialog
+                    open={downloadDialogOpen}
+                    onClose={handleDownloadDialogClose}
+                    downloadUrl={`${EPUB_BASE_URL}/epubs/${revisionId}`}
+                    fileName={`${revisionId}.epub`}
+                    lawTitle={law.revisionInfo?.lawTitle || ""}
+                  />
+                </>
               )}
             </Stack>
           </Grid>
