@@ -155,6 +155,8 @@ jobs:
       - name: Check if all jobs passed
         run: |
           if [[ "${{ needs.lint.result }}" != "success" || \
+                "${{ needs.test.result }}" != "success" || \
+                "${{ needs.e2e.result }}" != "success" || \
                 "${{ needs.type-check.result }}" != "success" || \
                 "${{ needs.build.result }}" != "success" ]]; then
             echo "One or more CI checks failed"
