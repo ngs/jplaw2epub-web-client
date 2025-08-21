@@ -15,10 +15,7 @@ import {
   ListItemText,
 } from "@mui/material";
 import { grey } from "@mui/material/colors";
-import type {
-  LawType,
-  CurrentRevisionStatus,
-} from "../../gql/graphql";
+import type { LawType, CurrentRevisionStatus } from "../../gql/graphql";
 import type { Law, KeywordItem } from "../../types/search";
 import type { FC } from "react";
 
@@ -77,21 +74,13 @@ export const SearchResultCard: FC<SearchResultCardProps> = ({
   const EPUB_BASE_URL =
     import.meta.env.VITE_EPUB_BASE_URL || "https://api.jplaw2epub.ngs.io";
 
-  const handleDownloadEpub = (revisionId: string) => {
-    window.open(`${EPUB_BASE_URL}/epubs/${revisionId}`, "_blank");
-  };
-
   return (
     <Card key={law.lawInfo?.lawId ?? index} sx={{ mb: 2 }}>
       <CardContent>
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, md: 9 }}>
             <Stack direction="row" spacing={1} alignItems="center" mb={1}>
-              <Typography
-                variant="h6"
-                component="h3"
-                sx={{ maxWidth: "100%" }}
-              >
+              <Typography variant="h6" component="h3" sx={{ maxWidth: "100%" }}>
                 {law.revisionInfo?.lawTitleKana ? (
                   <ruby>
                     {law.revisionInfo?.lawTitle}
@@ -200,10 +189,13 @@ export const SearchResultCard: FC<SearchResultCardProps> = ({
               {revisionId && (
                 <Tooltip title="EPUBをダウンロード">
                   <Button
+                    LinkComponent={"a"}
+                    href={`${EPUB_BASE_URL}/epubs/${revisionId}`}
                     variant="contained"
                     fullWidth
+                    target="_blank"
                     startIcon={<DownloadIcon />}
-                    onClick={() => handleDownloadEpub(revisionId)}
+                    download={`${revisionId}.epub`}
                   >
                     EPUBダウンロード
                   </Button>
