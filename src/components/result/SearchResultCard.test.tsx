@@ -43,7 +43,7 @@ describe("SearchResultCard", () => {
 
   beforeEach(() => {
     // Set default EPUB base URL
-    vi.stubEnv('VITE_EPUB_BASE_URL', 'https://example.com');
+    vi.stubEnv("VITE_EPUB_BASE_URL", "https://example.com");
   });
 
   it("should render law information", () => {
@@ -108,7 +108,9 @@ describe("SearchResultCard", () => {
     expect(screen.getByText(/該当箇所:/)).toBeInTheDocument();
     // The text is rendered as HTML with <span> tags
     const textElement = screen.getByText((_, element) => {
-      return element?.innerHTML === "この法律は、<span>テスト</span>を目的とする。";
+      return (
+        element?.innerHTML === "この法律は、<span>テスト</span>を目的とする。"
+      );
     });
     expect(textElement).toBeInTheDocument();
   });
@@ -137,7 +139,7 @@ describe("SearchResultCard", () => {
 
     render(<SearchResultCard item={multiMatchItem} index={0} />);
 
-    const listItems = screen.getAllByRole('listitem');
+    const listItems = screen.getAllByRole("listitem");
     expect(listItems).toHaveLength(2);
   });
 
@@ -146,24 +148,17 @@ describe("SearchResultCard", () => {
 
     const downloadButton = screen.getByText("EPUBダウンロード");
     expect(downloadButton).toBeInTheDocument();
-    expect(downloadButton.closest('button')).toBeInTheDocument();
+    expect(downloadButton.closest("a")).toBeInTheDocument();
   });
 
   it("should handle download button click", () => {
-    const originalOpen = window.open;
-    window.open = vi.fn();
-    
     render(<SearchResultCard item={mockLaw} index={0} />);
 
-    const downloadButton = screen.getByText("EPUBダウンロード").closest('button');
-    downloadButton?.click();
-    
-    expect(window.open).toHaveBeenCalledWith(
-      "https://example.com/epubs/revision-1",
-      "_blank"
+    const downloadButton = screen.getByText("EPUBダウンロード").closest("a");
+    expect(downloadButton?.getAttribute("href")).toEqual(
+      "https://example.com/epubs/revision-1"
     );
-    
-    window.open = originalOpen;
+    expect(downloadButton?.getAttribute("download")).toEqual("revision-1.epub");
   });
 
   it("should display cabinet order type correctly", () => {
