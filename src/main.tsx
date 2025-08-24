@@ -10,12 +10,12 @@ if ("serviceWorker" in navigator) {
         // eslint-disable-next-line no-console
         console.log(
           "ServiceWorker registration successful with scope: ",
-          registration.scope
+          registration.scope,
         );
       },
       (err) => {
         console.error("ServiceWorker registration failed: ", err);
-      }
+      },
     );
   });
 }
@@ -23,5 +23,5 @@ if ("serviceWorker" in navigator) {
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <App />
-  </StrictMode>
+  </StrictMode>,
 );

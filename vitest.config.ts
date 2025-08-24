@@ -1,9 +1,9 @@
 import { defineConfig, mergeConfig } from "vitest/config";
 import viteConfig from "./vite.config";
 
-export default defineConfig((configEnv) => 
+export default defineConfig((configEnv) =>
   mergeConfig(
-    typeof viteConfig === 'function' ? viteConfig(configEnv) : viteConfig,
+    typeof viteConfig === "function" ? viteConfig(configEnv) : viteConfig,
     defineConfig({
       test: {
         globals: true,
@@ -31,6 +31,6 @@ export default defineConfig((configEnv) =>
           ],
         },
       },
-    })
-  )
+    }),
+  ),
 );

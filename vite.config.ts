@@ -12,34 +12,39 @@ export default defineConfig(({ mode }) => ({
     react(),
     markdownToHtmlPlugin({
       docsDir: "public-docs",
-      outputDir: ""  // Output directly to dist root (e.g., dist/help/index.html)
+      outputDir: "", // Output directly to dist root (e.g., dist/help/index.html)
     }),
     markdownDevServerPlugin({
-      docsDir: "public-docs"
+      docsDir: "public-docs",
     }),
     faviconGenerator(),
     serviceWorkerDevPlugin(),
-    serviceWorkerManifestPlugin()
+    serviceWorkerManifestPlugin(),
   ],
   base: "/",
   publicDir: "public",
   build: {
     rollupOptions: {
       input: {
-        main: './index.html',
-        sw: './src/sw/index.ts'
+        main: "./index.html",
+        sw: "./src/sw/index.ts",
       },
       output: {
         entryFileNames: (chunkInfo) => {
-          return chunkInfo.name === 'sw' ? '[name].js' : 'assets/[name]-[hash].js';
-        }
-      }
-    }
+          return chunkInfo.name === "sw"
+            ? "[name].js"
+            : "assets/[name]-[hash].js";
+        },
+      },
+    },
   },
   worker: {
-    format: 'es'
+    format: "es",
   },
-  define: mode === 'production' ? {} : {
-    '__VITE_SW_MANIFEST__': '[]'
-  }
+  define:
+    mode === "production"
+      ? {}
+      : {
+          __VITE_SW_MANIFEST__: "[]",
+        },
 }));

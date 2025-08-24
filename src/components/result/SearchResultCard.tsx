@@ -87,7 +87,7 @@ export const SearchResultCard: FC<SearchResultCardProps> = ({
       e.preventDefault();
       setDownloadDialogOpen(true);
     },
-    []
+    [],
   );
 
   const handleDownloadDialogClose = useCallback(() => {
@@ -144,7 +144,7 @@ export const SearchResultCard: FC<SearchResultCardProps> = ({
                 <Typography variant="body2" color="text.secondary">
                   公布日:{" "}
                   {new Date(law.lawInfo.promulgationDate).toLocaleDateString(
-                    "ja-JP"
+                    "ja-JP",
                   )}
                 </Typography>
               )}

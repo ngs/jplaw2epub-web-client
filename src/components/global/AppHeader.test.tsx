@@ -1,40 +1,42 @@
-import { render, screen } from '@testing-library/react';
-import { BrowserRouter } from 'react-router';
-import { describe, it, expect, vi } from 'vitest';
-import { AppHeader } from './AppHeader';
+import { render, screen } from "@testing-library/react";
+import { BrowserRouter } from "react-router";
+import { describe, it, expect, vi } from "vitest";
+import { AppHeader } from "./AppHeader";
 
-describe('AppHeader', () => {
+describe("AppHeader", () => {
   const mockOnHomeClick = vi.fn();
 
-  it('should render the header with title', () => {
+  it("should render the header with title", () => {
     render(
       <BrowserRouter>
         <AppHeader onHomeClick={mockOnHomeClick} />
-      </BrowserRouter>
+      </BrowserRouter>,
     );
-    
-    expect(screen.getByText('法令検索・EPUB ダウンロード')).toBeInTheDocument();
+
+    expect(screen.getByText("法令検索・EPUB ダウンロード")).toBeInTheDocument();
   });
 
-  it('should have a link to home page', () => {
+  it("should have a link to home page", () => {
     render(
       <BrowserRouter>
         <AppHeader onHomeClick={mockOnHomeClick} />
-      </BrowserRouter>
+      </BrowserRouter>,
     );
-    
-    const homeLink = screen.getByRole('link', { name: /法令検索・EPUB ダウンロード/i });
-    expect(homeLink).toHaveAttribute('href', '/');
+
+    const homeLink = screen.getByRole("link", {
+      name: /法令検索・EPUB ダウンロード/i,
+    });
+    expect(homeLink).toHaveAttribute("href", "/");
   });
 
-  it('should have help link', () => {
+  it("should have help link", () => {
     render(
       <BrowserRouter>
         <AppHeader onHomeClick={mockOnHomeClick} />
-      </BrowserRouter>
+      </BrowserRouter>,
     );
-    
-    const helpLink = screen.getByRole('link', { name: /ヘルプ/i });
-    expect(helpLink).toHaveAttribute('href', '/help/');
+
+    const helpLink = screen.getByRole("link", { name: /ヘルプ/i });
+    expect(helpLink).toHaveAttribute("href", "/help/");
   });
 });

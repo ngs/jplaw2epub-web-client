@@ -3,14 +3,14 @@ import type { Plugin } from "vite";
 export function serviceWorkerManifestPlugin(): Plugin {
   return {
     name: "service-worker-manifest",
-    enforce: 'post',
-    
+    enforce: "post",
+
     generateBundle(_options, bundle) {
       // Collect all generated assets
       const staticAssets = [
         "/",
         "/help/",
-        "/favicon.svg", 
+        "/favicon.svg",
         "/favicon-32x32.png",
         "/apple-touch-icon.png",
       ];
@@ -29,10 +29,10 @@ export function serviceWorkerManifestPlugin(): Plugin {
           // Handle both minified and non-minified versions
           chunk.code = chunk.code.replace(
             /__VITE_SW_MANIFEST__/g,
-            JSON.stringify(staticAssets)
+            JSON.stringify(staticAssets),
           );
         }
       }
-    }
+    },
   };
 }

@@ -116,7 +116,7 @@ describe("parseGraphQLError", () => {
 
     const result = parseGraphQLError(apolloError);
     expect(result).toBe(
-      "A network error occurred. Please check your connection."
+      "A network error occurred. Please check your connection.",
     );
   });
 
@@ -181,7 +181,7 @@ describe("parseGraphQLError", () => {
 
     const result = parseGraphQLError(apolloError);
     expect(result).toBe(
-      "Date out of range\nRegular GraphQL error\nServer error"
+      "Date out of range\nRegular GraphQL error\nServer error",
     );
   });
 });

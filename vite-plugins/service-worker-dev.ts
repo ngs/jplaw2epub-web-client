@@ -6,7 +6,7 @@ export function serviceWorkerDevPlugin(): Plugin {
   return {
     name: "service-worker-dev",
     apply: "serve", // Only apply in dev server
-    
+
     configureServer(server) {
       // Handle /sw.js requests in development
       server.middlewares.use(async (req, res, next) => {
@@ -19,18 +19,18 @@ export function serviceWorkerDevPlugin(): Plugin {
               write: false,
               format: "esm",
               define: {
-                "__VITE_SW_MANIFEST__": JSON.stringify([
+                __VITE_SW_MANIFEST__: JSON.stringify([
                   "/",
                   "/help/",
                   "/favicon.svg",
                   "/favicon-32x32.png",
                   "/apple-touch-icon.png",
-                ])
-              }
+                ]),
+              },
             });
 
             const code = result.outputFiles[0].text;
-            
+
             res.setHeader("Content-Type", "application/javascript");
             res.setHeader("Cache-Control", "no-cache");
             res.end(code);
@@ -43,6 +43,6 @@ export function serviceWorkerDevPlugin(): Plugin {
           next();
         }
       });
-    }
+    },
   };
 }

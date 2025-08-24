@@ -41,6 +41,48 @@ export const EpubDownloadDialog: FC<EpubDownloadDialogProps> = ({
   // Check if File System Access API is supported
   const isFileSaveSupported = "showSaveFilePicker" in window;
 
+  // Check if Service Worker is supported (not necessarily ready)
+  const [isServiceWorkerReady, setIsServiceWorkerReady] = useState(
+    "serviceWorker" in navigator && !!navigator.serviceWorker.controller,
+  );
+
+  // Wait for Service Worker to be ready
+  useEffect(() => {
+    if (!("serviceWorker" in navigator)) return;
+
+    // Check if controller is already available
+    if (navigator.serviceWorker.controller) {
+      setIsServiceWorkerReady(true);
+      return;
+    }
+
+    // Wait for controller to be available
+    const handleControllerChange = () => {
+      if (navigator.serviceWorker.controller) {
+        setIsServiceWorkerReady(true);
+      }
+    };
+
+    navigator.serviceWorker.addEventListener(
+      "controllerchange",
+      handleControllerChange,
+    );
+
+    // Also check when service worker is ready
+    navigator.serviceWorker.ready.then(() => {
+      if (navigator.serviceWorker.controller) {
+        setIsServiceWorkerReady(true);
+      }
+    });
+
+    return () => {
+      navigator.serviceWorker.removeEventListener(
+        "controllerchange",
+        handleControllerChange,
+      );
+    };
+  }, []);
+
   // Reset state when dialog opens
   useEffect(() => {
     if (open) {
@@ -51,7 +93,75 @@ export const EpubDownloadDialog: FC<EpubDownloadDialogProps> = ({
     }
   }, [open]);
 
+  // Set up Service Worker message listener
+  useEffect(() => {
+    if (!("serviceWorker" in navigator)) return;
+
+    const handleMessage = (event: MessageEvent) => {
+      const { data } = event;
+
+      // Check if this message is for our session
+      if (!data.sessionId || !data.sessionId.startsWith("download-")) {
+        return;
+      }
+
+      switch (data.type) {
+        case "download-progress":
+          setProgress(data.progress);
+          break;
+
+        case "download-complete":
+          // Convert base64 back to blob
+          fetch(data.data)
+            .then((res) => res.blob())
+            .then((blob) => {
+              blobRef.current = blob;
+              setDownloadState("completed");
+              setProgress(100);
+            });
+          break;
+
+        case "download-error":
+          setError(data.error);
+          setDownloadState("error");
+          break;
+      }
+    };
+
+    navigator.serviceWorker.addEventListener("message", handleMessage);
+
+    return () => {
+      navigator.serviceWorker.removeEventListener("message", handleMessage);
+    };
+  }, []);
+
   const handleStartDownload = useCallback(async () => {
+    // Try to use Service Worker if available
+    if (isServiceWorkerReady && navigator.serviceWorker.controller) {
+      try {
+        setDownloadState("downloading");
+        setError(null);
+        setProgress(0);
+
+        // Create a unique client ID for this download session
+        const clientId = `download-${Date.now()}-${Math.random()
+          .toString(36)
+          .substring(2, 11)}`;
+
+        // Send download request to Service Worker
+        navigator.serviceWorker.controller.postMessage({
+          type: "download-epub",
+          url: downloadUrl,
+          clientId: clientId,
+        });
+        return;
+      } catch {
+        // Fall through to use the fallback method
+        console.warn("Service Worker download failed, using fallback");
+      }
+    }
+
+    // Fallback to original implementation if Service Worker is not available
     try {
       setDownloadState("downloading");
       setError(null);
@@ -92,7 +202,7 @@ export const EpubDownloadDialog: FC<EpubDownloadDialogProps> = ({
           await new Promise((resolve) =>
             setTimeout(() => {
               requestAnimationFrame(resolve);
-            }, 1000)
+            }, 1000),
           );
           break;
         }
@@ -111,7 +221,7 @@ export const EpubDownloadDialog: FC<EpubDownloadDialogProps> = ({
             await new Promise((resolve) =>
               setTimeout(() => {
                 requestAnimationFrame(resolve);
-              }, 1)
+              }, 1),
             );
           }
         }
@@ -136,7 +246,7 @@ export const EpubDownloadDialog: FC<EpubDownloadDialogProps> = ({
     } finally {
       abortControllerRef.current = null;
     }
-  }, [downloadUrl]);
+  }, [downloadUrl, isServiceWorkerReady]);
 
   const handleSaveFile = useCallback(async () => {
     if (!blobRef.current) return;

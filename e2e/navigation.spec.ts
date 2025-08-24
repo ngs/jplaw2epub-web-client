@@ -47,7 +47,7 @@ test.describe("Navigation", () => {
     await expect(
       newPage.getByRole("heading", {
         name: "法令検索・EPUB ダウンロード ヘルプ",
-      })
+      }),
     ).toBeVisible();
   });
 
@@ -57,7 +57,7 @@ test.describe("Navigation", () => {
 
     // Check that help content is displayed
     await expect(
-      page.getByRole("heading", { name: "法令検索・EPUB ダウンロード ヘルプ" })
+      page.getByRole("heading", { name: "法令検索・EPUB ダウンロード ヘルプ" }),
     ).toBeVisible();
 
     // Check some help content exists
@@ -90,7 +90,7 @@ test.describe("Navigation", () => {
 
     // Search term should still be in the input
     await expect(
-      page.getByPlaceholder("法令名を入力してください。")
+      page.getByPlaceholder("法令名を入力してください。"),
     ).toHaveValue("民法");
 
     await page.waitForSelector("text=/検索結果/", {
@@ -129,7 +129,7 @@ test.describe("Navigation", () => {
 
     // Should show first search
     await expect(
-      page.getByPlaceholder("法令名を入力してください。")
+      page.getByPlaceholder("法令名を入力してください。"),
     ).toHaveValue("民法");
 
     // Go forward
@@ -142,7 +142,7 @@ test.describe("Navigation", () => {
 
     // Should show second search
     await expect(
-      page.getByPlaceholder("法令名を入力してください。")
+      page.getByPlaceholder("法令名を入力してください。"),
     ).toHaveValue("刑法");
   });
 
@@ -154,7 +154,7 @@ test.describe("Navigation", () => {
 
     // Search input should be populated
     await expect(
-      page.getByPlaceholder("法令名を入力してください。")
+      page.getByPlaceholder("法令名を入力してください。"),
     ).toHaveValue("憲法");
 
     await page.waitForSelector("text=/検索結果/", {
@@ -171,12 +171,12 @@ test.describe("Navigation", () => {
     // Keyword tab should be active
     await expect(page.getByRole("tab", { name: "キーワード" })).toHaveAttribute(
       "aria-selected",
-      "true"
+      "true",
     );
 
     // Keyword input should be populated
     await expect(
-      page.getByPlaceholder("検索語句を入力してください。")
+      page.getByPlaceholder("検索語句を入力してください。"),
     ).toHaveValue("契約");
 
     await page.waitForSelector("text=/検索結果/", {

@@ -156,7 +156,7 @@ describe("SearchResultCard", () => {
 
     const downloadButton = screen.getByText("EPUBダウンロード").closest("a");
     expect(downloadButton?.getAttribute("href")).toEqual(
-      "https://example.com/epubs/revision-1"
+      "https://example.com/epubs/revision-1",
     );
     expect(downloadButton?.getAttribute("download")).toEqual("revision-1.epub");
   });
