@@ -25,7 +25,12 @@ interface EpubDownloadDialogProps {
   lawTitle: string;
 }
 
-type DownloadState = "idle" | "generating" | "downloading" | "completed" | "error";
+type DownloadState =
+  | "idle"
+  | "generating"
+  | "downloading"
+  | "completed"
+  | "error";
 
 export const EpubDownloadDialog: FC<EpubDownloadDialogProps> = ({
   open,
@@ -42,13 +47,32 @@ export const EpubDownloadDialog: FC<EpubDownloadDialogProps> = ({
   const sessionIdRef = useRef<string | null>(null);
 
   // Extract EPUB ID from downloadUrl (format: /epubs/{epubId})
-  const epubId = downloadUrl.split('/').pop() || '';
+  const epubId = downloadUrl.split("/").pop() || "";
 
   // Check if File System Access API is supported
   const isFileSaveSupported = "showSaveFilePicker" in window;
 
   // Check if Service Worker is ready
-  const isServiceWorkerReady = "serviceWorker" in navigator && !!navigator.serviceWorker.controller;
+  const isServiceWorkerReady =
+    "serviceWorker" in navigator && !!navigator.serviceWorker.controller;
+
+  // Convert EPUB status to Japanese message
+  const getStatusMessage = (status: EpubStatus | null): string => {
+    if (!status) return "";
+
+    switch (status) {
+      case "PENDING":
+        return "生成開始中";
+      case "PROCESSING":
+        return "ファイル生成中";
+      case "COMPLETED":
+        return "生成完了";
+      case "FAILED":
+        return "生成失敗";
+      default:
+        return status;
+    }
+  };
 
   // Reset state when dialog opens
   useEffect(() => {
@@ -118,7 +142,9 @@ export const EpubDownloadDialog: FC<EpubDownloadDialogProps> = ({
 
   const handleStartDownload = useCallback(() => {
     if (!isServiceWorkerReady || !navigator.serviceWorker.controller) {
-      setError("Service Workerが利用できません。ページを再読み込みしてください。");
+      setError(
+        "Service Workerが利用できません。ページを再読み込みしてください。"
+      );
       setDownloadState("error");
       return;
     }
@@ -135,7 +161,9 @@ export const EpubDownloadDialog: FC<EpubDownloadDialogProps> = ({
     sessionIdRef.current = sessionId;
 
     // Get GraphQL endpoint from environment
-    const graphqlEndpoint = import.meta.env.VITE_GRAPHQL_ENDPOINT || "https://api.jplaw2epub.ngs.io/graphql";
+    const graphqlEndpoint =
+      import.meta.env.VITE_GRAPHQL_ENDPOINT ||
+      "https://api.jplaw2epub.ngs.io/graphql";
 
     // Send EPUB generation request to Service Worker
     navigator.serviceWorker.controller.postMessage({
@@ -215,11 +243,15 @@ export const EpubDownloadDialog: FC<EpubDownloadDialogProps> = ({
             <Box display="flex" alignItems="center" gap={2}>
               <CircularProgress size={20} />
               <Typography variant="body2" color="text.secondary">
-                EPUB生成中... {epubStatus && `(${epubStatus})`}
+                {getStatusMessage(epubStatus) || "EPUB生成中"}...
               </Typography>
             </Box>
             {epubStatus === "PROCESSING" && (
-              <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ mt: 1 }}
+              >
                 ファイルを生成しています。しばらくお待ちください...
               </Typography>
             )}
@@ -261,7 +293,8 @@ export const EpubDownloadDialog: FC<EpubDownloadDialogProps> = ({
           </>
         )}
 
-        {(downloadState === "generating" || downloadState === "downloading") && (
+        {(downloadState === "generating" ||
+          downloadState === "downloading") && (
           <Button onClick={handleCancel}>キャンセル</Button>
         )}
 
