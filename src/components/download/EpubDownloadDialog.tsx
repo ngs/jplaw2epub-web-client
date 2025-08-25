@@ -47,47 +47,8 @@ export const EpubDownloadDialog: FC<EpubDownloadDialogProps> = ({
   // Check if File System Access API is supported
   const isFileSaveSupported = "showSaveFilePicker" in window;
 
-  // Check if Service Worker is supported (not necessarily ready)
-  const [isServiceWorkerReady, setIsServiceWorkerReady] = useState(
-    "serviceWorker" in navigator && !!navigator.serviceWorker.controller
-  );
-
-  // Wait for Service Worker to be ready
-  useEffect(() => {
-    if (!("serviceWorker" in navigator)) return;
-
-    // Check if controller is already available
-    if (navigator.serviceWorker.controller) {
-      setIsServiceWorkerReady(true);
-      return;
-    }
-
-    // Wait for controller to be available
-    const handleControllerChange = () => {
-      if (navigator.serviceWorker.controller) {
-        setIsServiceWorkerReady(true);
-      }
-    };
-
-    navigator.serviceWorker.addEventListener(
-      "controllerchange",
-      handleControllerChange
-    );
-
-    // Also check when service worker is ready
-    navigator.serviceWorker.ready.then(() => {
-      if (navigator.serviceWorker.controller) {
-        setIsServiceWorkerReady(true);
-      }
-    });
-
-    return () => {
-      navigator.serviceWorker.removeEventListener(
-        "controllerchange",
-        handleControllerChange
-      );
-    };
-  }, []);
+  // Check if Service Worker is ready
+  const isServiceWorkerReady = "serviceWorker" in navigator && !!navigator.serviceWorker.controller;
 
   // Reset state when dialog opens
   useEffect(() => {
@@ -155,117 +116,35 @@ export const EpubDownloadDialog: FC<EpubDownloadDialogProps> = ({
     };
   }, []);
 
-  const handleStartDownload = useCallback(async () => {
-    // Try to use Service Worker if available
-    if (isServiceWorkerReady && navigator.serviceWorker.controller) {
-      try {
-        setDownloadState("generating");
-        setError(null);
-        setProgress(0);
-        setEpubStatus(null);
-
-        // Create a unique session ID for this download
-        const sessionId = `epub-${Date.now()}-${Math.random()
-          .toString(36)
-          .substring(2, 11)}`;
-        sessionIdRef.current = sessionId;
-
-        // Get GraphQL endpoint from environment
-        const graphqlEndpoint = import.meta.env.VITE_GRAPHQL_ENDPOINT || "https://api.jplaw2epub.ngs.io/graphql";
-
-        // Send EPUB generation request to Service Worker
-        navigator.serviceWorker.controller.postMessage({
-          type: "generate-epub",
-          epubId: epubId,
-          clientId: sessionId,
-          graphqlEndpoint: graphqlEndpoint,
-        });
-        return;
-      } catch {
-        // Fall through to use the fallback method
-        console.warn("Service Worker download failed, using fallback");
-      }
-    }
-
-    // Fallback to original implementation if Service Worker is not available
-    try {
-      setDownloadState("downloading");
-      setError(null);
-      setProgress(0);
-
-      // Fetch the EPUB file with progress tracking
-      const response = await fetch(downloadUrl);
-
-      if (!response.ok) {
-        throw new Error(`Download failed: ${response.statusText}`);
-      }
-
-      const contentLength = response.headers.get("content-length");
-      const total = contentLength ? parseInt(contentLength, 10) : 0;
-      const reader = response.body?.getReader();
-
-      if (!reader) {
-        throw new Error("Failed to read response body");
-      }
-
-      const chunks: Uint8Array[] = [];
-      let received = 0;
-
-      // Read the response stream with async updates
-      let lastUpdateTime = 0;
-      const UPDATE_INTERVAL = 100; // Update UI every 100ms
-
-      while (true) {
-        const { done, value } = await reader.read();
-
-        if (done) {
-          setProgress(100);
-          await new Promise((resolve) =>
-            setTimeout(() => {
-              requestAnimationFrame(resolve);
-            }, 1000)
-          );
-          break;
-        }
-
-        chunks.push(value);
-        received += value.length;
-
-        if (total > 0) {
-          const now = Date.now();
-          // Update progress at intervals to avoid blocking UI
-          if (now - lastUpdateTime > UPDATE_INTERVAL) {
-            const progressValue = (received / total) * 100;
-            setProgress(progressValue);
-            lastUpdateTime = now;
-            // Yield control to browser
-            await new Promise((resolve) =>
-              setTimeout(() => {
-                requestAnimationFrame(resolve);
-              }, 1)
-            );
-          }
-        }
-      }
-
-      // Combine chunks into a single blob
-      blobRef.current = new Blob(chunks as BlobPart[], {
-        type: "application/epub+zip",
-      });
-      setDownloadState("completed");
-    } catch (err) {
-      if (err instanceof Error) {
-        if (err.name === "AbortError") {
-          setError("ダウンロードがキャンセルされました");
-        } else {
-          setError(`ダウンロードエラー: ${err.message}`);
-        }
-      } else {
-        setError("ダウンロード中にエラーが発生しました");
-      }
+  const handleStartDownload = useCallback(() => {
+    if (!isServiceWorkerReady || !navigator.serviceWorker.controller) {
+      setError("Service Workerが利用できません。ページを再読み込みしてください。");
       setDownloadState("error");
+      return;
     }
-  }, [downloadUrl, epubId, isServiceWorkerReady]);
+
+    setDownloadState("generating");
+    setError(null);
+    setProgress(0);
+    setEpubStatus(null);
+
+    // Create a unique session ID for this download
+    const sessionId = `epub-${Date.now()}-${Math.random()
+      .toString(36)
+      .substring(2, 11)}`;
+    sessionIdRef.current = sessionId;
+
+    // Get GraphQL endpoint from environment
+    const graphqlEndpoint = import.meta.env.VITE_GRAPHQL_ENDPOINT || "https://api.jplaw2epub.ngs.io/graphql";
+
+    // Send EPUB generation request to Service Worker
+    navigator.serviceWorker.controller.postMessage({
+      type: "generate-epub",
+      epubId: epubId,
+      clientId: sessionId,
+      graphqlEndpoint: graphqlEndpoint,
+    });
+  }, [epubId, isServiceWorkerReady]);
 
   const handleSaveFile = useCallback(async () => {
     if (!blobRef.current) return;
