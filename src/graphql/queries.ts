@@ -132,3 +132,14 @@ export const GET_REVISIONS = gql`
     }
   }
 `;
+
+export const EPUB = gql`
+  query GetEpub($id: String!) {
+    epub(id: $id) {
+      signedUrl
+      id
+      status
+      error
+    }
+  }
+`;

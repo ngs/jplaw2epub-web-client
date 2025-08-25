@@ -11,8 +11,10 @@ import {
   Typography,
   Box,
   Alert,
+  CircularProgress,
 } from "@mui/material";
 import { useState, useCallback, useRef, useEffect } from "react";
+import type { EpubStatus } from "../../gql/graphql";
 import type { FC } from "react";
 
 interface EpubDownloadDialogProps {
@@ -23,7 +25,7 @@ interface EpubDownloadDialogProps {
   lawTitle: string;
 }
 
-type DownloadState = "idle" | "downloading" | "completed" | "error";
+type DownloadState = "idle" | "generating" | "downloading" | "completed" | "error";
 
 export const EpubDownloadDialog: FC<EpubDownloadDialogProps> = ({
   open,
@@ -35,15 +37,19 @@ export const EpubDownloadDialog: FC<EpubDownloadDialogProps> = ({
   const [downloadState, setDownloadState] = useState<DownloadState>("idle");
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [epubStatus, setEpubStatus] = useState<EpubStatus | null>(null);
   const blobRef = useRef<Blob | null>(null);
-  const abortControllerRef = useRef<AbortController | null>(null);
+  const sessionIdRef = useRef<string | null>(null);
+
+  // Extract EPUB ID from downloadUrl (format: /epubs/{epubId})
+  const epubId = downloadUrl.split('/').pop() || '';
 
   // Check if File System Access API is supported
   const isFileSaveSupported = "showSaveFilePicker" in window;
 
   // Check if Service Worker is supported (not necessarily ready)
   const [isServiceWorkerReady, setIsServiceWorkerReady] = useState(
-    "serviceWorker" in navigator && !!navigator.serviceWorker.controller,
+    "serviceWorker" in navigator && !!navigator.serviceWorker.controller
   );
 
   // Wait for Service Worker to be ready
@@ -65,7 +71,7 @@ export const EpubDownloadDialog: FC<EpubDownloadDialogProps> = ({
 
     navigator.serviceWorker.addEventListener(
       "controllerchange",
-      handleControllerChange,
+      handleControllerChange
     );
 
     // Also check when service worker is ready
@@ -78,7 +84,7 @@ export const EpubDownloadDialog: FC<EpubDownloadDialogProps> = ({
     return () => {
       navigator.serviceWorker.removeEventListener(
         "controllerchange",
-        handleControllerChange,
+        handleControllerChange
       );
     };
   }, []);
@@ -89,7 +95,9 @@ export const EpubDownloadDialog: FC<EpubDownloadDialogProps> = ({
       setDownloadState("idle");
       setProgress(0);
       setError(null);
+      setEpubStatus(null);
       blobRef.current = null;
+      sessionIdRef.current = null;
     }
   }, [open]);
 
@@ -101,11 +109,23 @@ export const EpubDownloadDialog: FC<EpubDownloadDialogProps> = ({
       const { data } = event;
 
       // Check if this message is for our session
-      if (!data.sessionId || !data.sessionId.startsWith("download-")) {
+      if (!data.sessionId || data.sessionId !== sessionIdRef.current) {
         return;
       }
 
       switch (data.type) {
+        case "epub-status":
+          setEpubStatus(data.status);
+          if (data.error) {
+            setError(data.error);
+          }
+          break;
+
+        case "download-starting":
+          setDownloadState("downloading");
+          setProgress(0);
+          break;
+
         case "download-progress":
           setProgress(data.progress);
           break;
@@ -139,20 +159,26 @@ export const EpubDownloadDialog: FC<EpubDownloadDialogProps> = ({
     // Try to use Service Worker if available
     if (isServiceWorkerReady && navigator.serviceWorker.controller) {
       try {
-        setDownloadState("downloading");
+        setDownloadState("generating");
         setError(null);
         setProgress(0);
+        setEpubStatus(null);
 
-        // Create a unique client ID for this download session
-        const clientId = `download-${Date.now()}-${Math.random()
+        // Create a unique session ID for this download
+        const sessionId = `epub-${Date.now()}-${Math.random()
           .toString(36)
           .substring(2, 11)}`;
+        sessionIdRef.current = sessionId;
 
-        // Send download request to Service Worker
+        // Get GraphQL endpoint from environment
+        const graphqlEndpoint = import.meta.env.VITE_GRAPHQL_ENDPOINT || "https://api.jplaw2epub.ngs.io/graphql";
+
+        // Send EPUB generation request to Service Worker
         navigator.serviceWorker.controller.postMessage({
-          type: "download-epub",
-          url: downloadUrl,
-          clientId: clientId,
+          type: "generate-epub",
+          epubId: epubId,
+          clientId: sessionId,
+          graphqlEndpoint: graphqlEndpoint,
         });
         return;
       } catch {
@@ -167,13 +193,8 @@ export const EpubDownloadDialog: FC<EpubDownloadDialogProps> = ({
       setError(null);
       setProgress(0);
 
-      // Create abort controller for cancellation
-      abortControllerRef.current = new AbortController();
-
       // Fetch the EPUB file with progress tracking
-      const response = await fetch(downloadUrl, {
-        signal: abortControllerRef.current.signal,
-      });
+      const response = await fetch(downloadUrl);
 
       if (!response.ok) {
         throw new Error(`Download failed: ${response.statusText}`);
@@ -202,7 +223,7 @@ export const EpubDownloadDialog: FC<EpubDownloadDialogProps> = ({
           await new Promise((resolve) =>
             setTimeout(() => {
               requestAnimationFrame(resolve);
-            }, 1000),
+            }, 1000)
           );
           break;
         }
@@ -221,7 +242,7 @@ export const EpubDownloadDialog: FC<EpubDownloadDialogProps> = ({
             await new Promise((resolve) =>
               setTimeout(() => {
                 requestAnimationFrame(resolve);
-              }, 1),
+              }, 1)
             );
           }
         }
@@ -243,10 +264,8 @@ export const EpubDownloadDialog: FC<EpubDownloadDialogProps> = ({
         setError("ダウンロード中にエラーが発生しました");
       }
       setDownloadState("error");
-    } finally {
-      abortControllerRef.current = null;
     }
-  }, [downloadUrl, isServiceWorkerReady]);
+  }, [downloadUrl, epubId, isServiceWorkerReady]);
 
   const handleSaveFile = useCallback(async () => {
     if (!blobRef.current) return;
@@ -269,8 +288,10 @@ export const EpubDownloadDialog: FC<EpubDownloadDialogProps> = ({
         await writable.close();
       } catch (err) {
         // User cancelled the save dialog
-        if (err instanceof Error && err.name === "AbortError") {
-          return;
+        if (err instanceof Error) {
+          if (err.name === "AbortError") {
+            return;
+          }
         }
         setError("ファイルの保存に失敗しました");
       }
@@ -287,13 +308,12 @@ export const EpubDownloadDialog: FC<EpubDownloadDialogProps> = ({
   }, [fileName, isFileSaveSupported, onClose]);
 
   const handleCancel = useCallback(() => {
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
     setDownloadState("idle");
     setProgress(0);
     setError(null);
+    setEpubStatus(null);
     blobRef.current = null;
+    sessionIdRef.current = null;
     onClose();
   }, [onClose]);
 
@@ -309,6 +329,22 @@ export const EpubDownloadDialog: FC<EpubDownloadDialogProps> = ({
           <Alert severity="error" sx={{ mt: 2, mb: 2 }}>
             {error}
           </Alert>
+        )}
+
+        {downloadState === "generating" && (
+          <Box sx={{ mt: 3 }}>
+            <Box display="flex" alignItems="center" gap={2}>
+              <CircularProgress size={20} />
+              <Typography variant="body2" color="text.secondary">
+                EPUB生成中... {epubStatus && `(${epubStatus})`}
+              </Typography>
+            </Box>
+            {epubStatus === "PROCESSING" && (
+              <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
+                ファイルを生成しています。しばらくお待ちください...
+              </Typography>
+            )}
+          </Box>
         )}
 
         {downloadState === "downloading" && (
@@ -346,7 +382,7 @@ export const EpubDownloadDialog: FC<EpubDownloadDialogProps> = ({
           </>
         )}
 
-        {downloadState === "downloading" && (
+        {(downloadState === "generating" || downloadState === "downloading") && (
           <Button onClick={handleCancel}>キャンセル</Button>
         )}
 
