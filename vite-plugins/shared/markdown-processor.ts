@@ -66,7 +66,7 @@ export function setupMarked(): void {
 export function extractTitle(
   content: string,
   metadata: Record<string, unknown>,
-  fallback: string
+  fallback: string,
 ): string {
   // Use metadata title if available
   if (metadata.title && typeof metadata.title === "string") {

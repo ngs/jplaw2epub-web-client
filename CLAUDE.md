@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **IMPORTANT: All documentation, code comments, and commit messages MUST be written in English.**
 
 - Documentation files (README.md, CLAUDE.md, etc.) - English only
-- Code comments - English only  
+- Code comments - English only
 - Commit messages - English only
 - Variable names, function names - English preferred (existing Japanese names may remain)
 - User-facing content (UI text, help.md) - May be in Japanese as this is a Japanese law application
@@ -46,6 +46,7 @@ Copy `.env.example` to `.env` and configure:
 ## Architecture
 
 ### Core Technology Stack
+
 - **React 19** with TypeScript
 - **Apollo Client** for GraphQL communication
 - **React Router v7** for navigation
@@ -85,11 +86,12 @@ The project enforces strict ESLint rules:
 3. **Import ordering**: Imports are automatically sorted alphabetically within groups
 4. **No console.log**: Only `console.warn` and `console.error` are allowed
 5. **English comments**: All code comments must be in English
-6. **Unused variables**: Variables starting with underscore (_) are allowed to be unused
+6. **Unused variables**: Variables starting with underscore (\_) are allowed to be unused
 
 ## GraphQL Integration
 
 The application uses Apollo Client with:
+
 - Cache-and-network fetch policy for optimal performance
 - Automatic type generation from GraphQL schema
 - Two main queries: `SEARCH_LAWS` and `KEYWORD_SEARCH`
@@ -162,19 +164,25 @@ The project includes a custom markdown documentation system:
 ## Recent Changes and Patterns
 
 ### Constants Extraction
+
 All fixed values are extracted to separate files in `src/constants/`:
+
 - Law categories, types, and era options
 - Pagination settings
 - Color palette (shared between theme and static HTML)
 
 ### Error Handling Pattern
+
 GraphQL errors are parsed to extract API-specific messages:
+
 ```typescript
 const errorMessage = parseGraphQLError(error);
 ```
 
 ### Form State Management
+
 Forms use React Hook Form with internal state that extends base types:
+
 ```typescript
 interface InternalFormData extends SearchFormData {
   // Additional internal fields
@@ -182,13 +190,17 @@ interface InternalFormData extends SearchFormData {
 ```
 
 ### URL Parameter Synchronization
+
 Search state is persisted in URL for bookmarkable searches:
+
 ```typescript
 const { params, updateParams } = useQueryParams();
 ```
 
 ### Markdown Rendering
+
 Custom marked renderer adds features:
+
 - Heading anchors with slugs
 - Syntax highlighting via highlight.js
 - Japanese character support in slugs
@@ -196,7 +208,9 @@ Custom marked renderer adds features:
 ## CI/CD Configuration
 
 ### GitHub Actions Workflow
+
 The project uses GitHub Actions for continuous integration with the following jobs:
+
 - **lint**: Runs ESLint for code style checking
 - **type-check**: Validates TypeScript types
 - **test**: Executes unit tests with Vitest
@@ -204,6 +218,7 @@ The project uses GitHub Actions for continuous integration with the following jo
 - **build**: Builds the production bundle
 
 ### Performance Optimizations
+
 - **Playwright Browser Caching**: E2E tests cache Playwright browsers at `/home/runner/.cache/ms-playwright` using the Playwright version as cache key
 - **npm Dependency Caching**: Node modules are cached automatically through `actions/setup-node`
 - **Japanese Font Support**: E2E tests install `fonts-noto-cjk` for proper Japanese text rendering

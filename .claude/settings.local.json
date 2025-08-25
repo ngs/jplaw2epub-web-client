@@ -13,7 +13,9 @@
       "Bash(npm run typecheck:*)",
       "Bash(npm run test:e2e:*)",
       "Bash(gh pr view:*)",
-      "Bash(gh pr edit:*)"
+      "Bash(gh pr edit:*)",
+      "Bash(rm:*)",
+      "Bash(npm run lint)"
     ],
     "deny": [],
     "ask": []

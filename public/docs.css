@@ -1,11 +1,11 @@
 :root {
-  --primary-main: #29339B;
-  --primary-light: #5460C0;
-  --primary-dark: #1A2270;
-  --secondary-main: #FF3A20;
-  --info-main: #74A4BC;
-  --success-main: #B6D6CC;
-  --warning-main: #F1FEC6;
+  --primary-main: #29339b;
+  --primary-light: #5460c0;
+  --primary-dark: #1a2270;
+  --secondary-main: #ff3a20;
+  --info-main: #74a4bc;
+  --success-main: #b6d6cc;
+  --warning-main: #f1fec6;
   --text-primary: rgba(0, 0, 0, 0.87);
   --text-secondary: rgba(0, 0, 0, 0.6);
   --background-default: #fff;
@@ -38,9 +38,10 @@ body {
 .paper {
   background-color: var(--background-paper);
   border-radius: 4px;
-  box-shadow: 0px 2px 1px -1px rgba(0,0,0,0.2), 
-              0px 1px 1px 0px rgba(0,0,0,0.14), 
-              0px 1px 3px 0px rgba(0,0,0,0.12);
+  box-shadow:
+    0px 2px 1px -1px rgba(0, 0, 0, 0.2),
+    0px 1px 1px 0px rgba(0, 0, 0, 0.14),
+    0px 1px 3px 0px rgba(0, 0, 0, 0.12);
   padding: 24px;
 }
 
@@ -121,7 +122,8 @@ a:hover {
 }
 
 /* Lists */
-ul, ol {
+ul,
+ol {
   margin-bottom: 1rem;
   padding-left: 2rem;
 }
@@ -167,7 +169,8 @@ table {
   margin-bottom: 1rem;
 }
 
-th, td {
+th,
+td {
   text-align: left;
   padding: 12px;
   border-bottom: 1px solid var(--divider);
@@ -256,15 +259,15 @@ th {
   .container {
     padding: 16px;
   }
-  
+
   .paper {
     padding: 16px;
   }
-  
+
   h1 {
     font-size: 1.75rem;
   }
-  
+
   h2 {
     font-size: 1.25rem;
   }

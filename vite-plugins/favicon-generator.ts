@@ -41,7 +41,7 @@ export function faviconGenerator(): Plugin {
           await sharp(svgBuffer).resize(size, size).png().toFile(outputPath);
           // eslint-disable-next-line no-console
           console.log(`Generated ${filename} (${size}x${size})`);
-        })
+        }),
       );
 
       // Copy original SVG as favicon.svg

@@ -14,7 +14,7 @@ export interface MarkdownDevServerOptions {
 }
 
 export function markdownDevServerPlugin(
-  options: MarkdownDevServerOptions = {}
+  options: MarkdownDevServerOptions = {},
 ): Plugin {
   const { docsDir = "public-docs" } = options;
 

@@ -75,15 +75,15 @@ export const SearchForm: FC<SearchFormProps> = ({
         searchMode: initialValues?.keyword
           ? "keyword"
           : initialValues?.lawNum
-          ? "number"
-          : "name",
+            ? "number"
+            : "name",
         lawTimeMode: initialValues?.asof ? "point" : "current",
         lawType:
-          initialValues?.lawType?.length ?? 0 > 0
+          (initialValues?.lawType?.length ?? 0 > 0)
             ? initialValues.lawType
             : lawCategories.map((cat) => cat.value), // Check all by default
         categoryCode:
-          initialValues?.categoryCode?.length ?? 0 > 0
+          (initialValues?.categoryCode?.length ?? 0 > 0)
             ? initialValues.categoryCode
             : categoryOptions.map((cat) => cat.value), // Check all by default
         ...initialValues, // Apply initialValues last to override
@@ -125,8 +125,8 @@ export const SearchForm: FC<SearchFormProps> = ({
       searchMode: initialValues?.keyword
         ? "keyword"
         : initialValues?.lawNum
-        ? "number"
-        : "name",
+          ? "number"
+          : "name",
       lawTimeMode: initialValues?.asof ? "point" : "current",
       lawType:
         initialValues?.lawType && initialValues.lawType.length > 0

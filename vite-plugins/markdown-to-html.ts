@@ -9,14 +9,13 @@ import type { Plugin } from "vite";
 // Setup marked with syntax highlighting
 setupMarked();
 
-
 export interface MarkdownToHtmlOptions {
   docsDir?: string;
   outputDir?: string;
 }
 
 export function markdownToHtmlPlugin(
-  options: MarkdownToHtmlOptions = {}
+  options: MarkdownToHtmlOptions = {},
 ): Plugin {
   const { docsDir = "public-docs", outputDir = "" } = options;
 
@@ -57,7 +56,11 @@ export function markdownToHtmlPlugin(
           const htmlContent = await marked(content);
 
           // Extract title
-          const title = extractTitle(content, metadata, file.replace(".md", ""));
+          const title = extractTitle(
+            content,
+            metadata,
+            file.replace(".md", ""),
+          );
 
           // Create full HTML document
           const fullHtml = createHtmlTemplate({
@@ -87,7 +90,7 @@ export function markdownToHtmlPlugin(
       } catch (error) {
         console.error(
           "[markdown-to-html] Error processing markdown files:",
-          error
+          error,
         );
       }
     },

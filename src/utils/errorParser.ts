@@ -5,7 +5,9 @@ import type { ApolloError } from "@apollo/client";
  * @param error - ApolloError
  * @returns Formatted error message
  */
-export const parseGraphQLError = (error: Error | ApolloError | null): string => {
+export const parseGraphQLError = (
+  error: Error | ApolloError | null,
+): string => {
   if (!error) return "An unknown error occurred";
 
   // For ApolloError
@@ -13,7 +15,7 @@ export const parseGraphQLError = (error: Error | ApolloError | null): string => 
     // Extract GraphQL error messages
     const messages = error.graphQLErrors.map((gqlError) => {
       const message = gqlError.message;
-      
+
       // Try to parse API error (e.g., "API error 400: {...}")
       const apiErrorMatch = message.match(/API error \d+: ({.+})/);
       if (apiErrorMatch) {
@@ -25,7 +27,7 @@ export const parseGraphQLError = (error: Error | ApolloError | null): string => 
           return message;
         }
       }
-      
+
       return message;
     });
 

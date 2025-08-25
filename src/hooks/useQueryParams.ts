@@ -92,7 +92,9 @@ export const useQueryParams = () => {
       ];
       params.categoryCode = categoryCode
         .split(",")
-        .filter((c) => validCategories.includes(c as CategoryCode)) as CategoryCode[];
+        .filter((c) =>
+          validCategories.includes(c as CategoryCode),
+        ) as CategoryCode[];
     }
     if (asof) params.asof = asof;
     if (promulgateDateFrom) params.promulgateDateFrom = promulgateDateFrom;
@@ -111,11 +113,19 @@ export const useQueryParams = () => {
         newSearchParams.set("lawTitleKana", params.lawTitleKana);
       if (params.lawNum) newSearchParams.set("lawNum", params.lawNum);
       // Don't include in URL if all 7 law types are selected
-      if (params.lawType && params.lawType.length > 0 && params.lawType.length < 7) {
+      if (
+        params.lawType &&
+        params.lawType.length > 0 &&
+        params.lawType.length < 7
+      ) {
         newSearchParams.set("lawType", params.lawType.join(","));
       }
       // Don't include in URL if all 50 categories are selected
-      if (params.categoryCode && params.categoryCode.length > 0 && params.categoryCode.length < 50) {
+      if (
+        params.categoryCode &&
+        params.categoryCode.length > 0 &&
+        params.categoryCode.length < 50
+      ) {
         newSearchParams.set("categoryCode", params.categoryCode.join(","));
       }
       if (params.asof) newSearchParams.set("asof", params.asof);
@@ -126,7 +136,7 @@ export const useQueryParams = () => {
 
       setSearchParams(newSearchParams, { replace: options?.replace ?? false });
     },
-    [setSearchParams]
+    [setSearchParams],
   );
 
   const getCurrentPage = useCallback((): number => {
@@ -149,7 +159,7 @@ export const useQueryParams = () => {
 
       setSearchParams(newSearchParams, { replace: options?.replace ?? false });
     },
-    [searchParams, setSearchParams]
+    [searchParams, setSearchParams],
   );
 
   return {

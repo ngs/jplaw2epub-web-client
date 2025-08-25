@@ -49,10 +49,10 @@
 ダウンロードした EPUB ファイルは、以下のデバイス・アプリケーションで閲覧できます：
 
 - **電子書籍リーダー**: Kindle、Kobo、Sony Reader など
-- **タブレット・スマートフォン**: 
+- **タブレット・スマートフォン**:
   - iOS: Apple Books、Kindle アプリ
   - Android: Google Play ブックス、Kindle アプリ
-- **デスクトップ**: 
+- **デスクトップ**:
   - Windows / macOS: Adobe Digital Editions、Calibre
   - ブラウザ拡張: EPUBReader (Firefox/Chrome)
 
@@ -92,6 +92,7 @@
 - **メール**: [a@ngs.io](mailto:a@ngs.io)
 
 報告時は以下の情報を含めていただけると助かります：
+
 - 使用ブラウザとバージョン
 - 発生した問題の詳細
 - エラーメッセージ（表示された場合）

@@ -1,19 +1,19 @@
-import js from '@eslint/js'
-import globals from 'globals'
-import reactHooks from 'eslint-plugin-react-hooks'
-import reactRefresh from 'eslint-plugin-react-refresh'
-import tseslint from 'typescript-eslint'
-import importPlugin from 'eslint-plugin-import'
-import { globalIgnores } from 'eslint/config'
+import js from "@eslint/js";
+import globals from "globals";
+import reactHooks from "eslint-plugin-react-hooks";
+import reactRefresh from "eslint-plugin-react-refresh";
+import tseslint from "typescript-eslint";
+import importPlugin from "eslint-plugin-import";
+import { globalIgnores } from "eslint/config";
 
 export default tseslint.config([
-  globalIgnores(['dist']),
+  globalIgnores(["dist"]),
   {
-    files: ['**/*.{ts,tsx}'],
+    files: ["**/*.{ts,tsx}"],
     extends: [
       js.configs.recommended,
       tseslint.configs.recommended,
-      reactHooks.configs['recommended-latest'],
+      reactHooks.configs["recommended-latest"],
       reactRefresh.configs.vite,
     ],
     languageOptions: {
@@ -25,72 +25,77 @@ export default tseslint.config([
     },
     rules: {
       // Disallow console usage except warn and error
-      'no-console': ['error', { allow: ['warn', 'error'] }],
-      
+      "no-console": ["error", { allow: ["warn", "error"] }],
+
       // Allow unused variables that start with underscore
-      '@typescript-eslint/no-unused-vars': [
-        'error',
+      "@typescript-eslint/no-unused-vars": [
+        "error",
         {
-          argsIgnorePattern: '^_',
-          varsIgnorePattern: '^_',
-          caughtErrorsIgnorePattern: '^_',
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_",
         },
       ],
-      
+
       // Enforce using import type for type-only imports
-      '@typescript-eslint/consistent-type-imports': [
-        'error',
+      "@typescript-eslint/consistent-type-imports": [
+        "error",
         {
-          prefer: 'type-imports',
-          fixStyle: 'separate-type-imports',
+          prefer: "type-imports",
+          fixStyle: "separate-type-imports",
         },
       ],
-      
+
       // Enforce import ordering
-      'import/order': [
-        'error',
+      "import/order": [
+        "error",
         {
           groups: [
-            'builtin',
-            'external',
-            'internal',
-            'parent',
-            'sibling',
-            'index',
-            'object',
-            'type',
+            "builtin",
+            "external",
+            "internal",
+            "parent",
+            "sibling",
+            "index",
+            "object",
+            "type",
           ],
-          'newlines-between': 'never',
+          "newlines-between": "never",
           alphabetize: {
-            order: 'asc',
+            order: "asc",
             caseInsensitive: true,
           },
         },
       ],
-      
+
       // Disallow React namespace usage and enforce arrow function components
-      'no-restricted-syntax': [
-        'error',
+      "no-restricted-syntax": [
+        "error",
         {
-          selector: 'TSTypeReference[typeName.type="TSQualifiedName"][typeName.left.name="React"]',
-          message: 'React namespace usage is prohibited. Use named imports instead. Example: import type { FC } from "react"',
+          selector:
+            'TSTypeReference[typeName.type="TSQualifiedName"][typeName.left.name="React"]',
+          message:
+            'React namespace usage is prohibited. Use named imports instead. Example: import type { FC } from "react"',
         },
         {
           selector: 'MemberExpression[object.name="React"]',
-          message: 'React namespace usage is prohibited. Use named imports instead. Example: import { useState } from "react"',
+          message:
+            'React namespace usage is prohibited. Use named imports instead. Example: import { useState } from "react"',
         },
         {
-          selector: 'ExportNamedDeclaration > FunctionDeclaration[id.name=/^[A-Z]/]',
-          message: 'Use arrow functions for React components. Example: export const Component: FC<Props> = () => {}',
+          selector:
+            "ExportNamedDeclaration > FunctionDeclaration[id.name=/^[A-Z]/]",
+          message:
+            "Use arrow functions for React components. Example: export const Component: FC<Props> = () => {}",
         },
       ],
     },
     settings: {
-      'import/resolver': {
+      "import/resolver": {
         typescript: {
           alwaysTryTypes: true,
         },
       },
     },
   },
-])
+]);

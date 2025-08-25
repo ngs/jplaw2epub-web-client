@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client';
+import { gql } from "@apollo/client";
 
 export const SEARCH_LAWS = gql`
   query SearchLaws(
@@ -129,6 +129,17 @@ export const GET_REVISIONS = gql`
         currentRevisionStatus
         repealStatus
       }
+    }
+  }
+`;
+
+export const EPUB = gql`
+  query GetEpub($id: String!) {
+    epub(id: $id) {
+      signedUrl
+      id
+      status
+      error
     }
   }
 `;
